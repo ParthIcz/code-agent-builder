@@ -296,7 +296,7 @@ export default function Editor() {
       {/* Main Layout */}
       <div className="flex h-[calc(100vh-73px)] relative z-10">
         {/* Desktop: Left Panel - Chat Agent */}
-        <div className="hidden lg:block w-80 xl:w-96 border-r border-purple-500/30 expensive-gradient/80 backdrop-blur-sm">
+        <div className="hidden lg:block w-80 xl:w-96 border-r border-border bg-card/30">
           <ChatAgent
             messages={chatMessages}
             onSubmit={handleChatSubmit}
