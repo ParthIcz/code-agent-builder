@@ -1,11 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { EditorView, lineNumbers } from '@codemirror/view';
+import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
-import { javascript } from '@codemirror/lang-javascript';
-import { html } from '@codemirror/lang-html';
-import { css } from '@codemirror/lang-css';
-import { json } from '@codemirror/lang-json';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -105,58 +100,36 @@ export function CodeEditor({ files, selectedFile, onFileSelect, onFileUpdate }: 
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const getLanguage = (filename: string) => {
-      const ext = filename.split('.').pop();
-      switch (ext) {
-        case 'js':
-        case 'jsx':
-        case 'ts':
-        case 'tsx':
-          return javascript({ jsx: true, typescript: ext === 'ts' || ext === 'tsx' });
-        case 'html':
-          return html();
-        case 'css':
-          return css();
-        case 'json':
-          return json();
-        default:
-          return javascript();
-      }
-    };
-
     const currentFile = files[selectedFile];
     if (!currentFile) return;
 
+    // Create minimal extensions array
+    const extensions = [
+      EditorView.theme({
+        "&": {
+          fontSize: "14px",
+          height: "100%",
+          backgroundColor: "#1e293b"
+        },
+        ".cm-content": {
+          padding: "16px",
+          minHeight: "100%",
+          color: "#e2e8f0"
+        },
+        ".cm-focused": {
+          outline: "none"
+        }
+      }),
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          onFileUpdate(selectedFile, update.state.doc.toString());
+        }
+      })
+    ];
+
     const state = EditorState.create({
       doc: currentFile.content,
-      extensions: [
-        lineNumbers(),
-        syntaxHighlighting(defaultHighlightStyle),
-        getLanguage(selectedFile),
-        EditorView.theme({
-          "&": {
-            fontSize: "14px",
-            height: "100%",
-            backgroundColor: "#1e293b"
-          },
-          ".cm-content": {
-            padding: "16px",
-            minHeight: "100%",
-            color: "#e2e8f0"
-          },
-          ".cm-focused": {
-            outline: "none"
-          },
-          ".cm-line": {
-            color: "#e2e8f0"
-          }
-        }),
-        EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
-            onFileUpdate(selectedFile, update.state.doc.toString());
-          }
-        })
-      ]
+      extensions
     });
 
     editorViewRef.current = new EditorView({
