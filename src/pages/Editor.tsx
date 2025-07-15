@@ -341,7 +341,7 @@ export default function Editor() {
         <Button
           onClick={handleDownload}
           size="icon"
-          className="h-12 w-12 rounded-full premium-gradient shadow-glow"
+          className="h-12 w-12 rounded-full glow-gradient shadow-luxury"
         >
           <Download className="h-5 w-5" />
         </Button>
