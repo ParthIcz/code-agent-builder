@@ -467,6 +467,7 @@ export function CodeEditor({
       {/* Mobile File Tree */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="w-64 p-0 lg:hidden bg-[#252526]">
+          <SheetTitle className="sr-only">File Explorer</SheetTitle>
           <FileTreeContent />
         </SheetContent>
       </Sheet>
