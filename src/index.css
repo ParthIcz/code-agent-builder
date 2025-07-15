@@ -304,6 +304,30 @@
     box-shadow: var(--shadow-glow);
   }
 
+  .shadow-expensive {
+    box-shadow: var(--shadow-expensive);
+  }
+
+  .shadow-luxury {
+    box-shadow: var(--shadow-luxury);
+  }
+
+  .shadow-elite {
+    box-shadow: var(--shadow-premium);
+  }
+
+  .glow-purple {
+    box-shadow: var(--glow-purple);
+  }
+
+  .glow-magenta {
+    box-shadow: var(--glow-magenta);
+  }
+
+  .glow-elite {
+    box-shadow: var(--glow-elite);
+  }
+
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out;
   }
