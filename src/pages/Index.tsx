@@ -53,30 +53,40 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden relative">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+      {/* Expensive mesh gradient background */}
+      <div className="absolute inset-0 mesh-gradient opacity-60" />
+      <div className="absolute inset-0 hero-gradient opacity-80" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/60" />
+
+      {/* Animated gradient orbs */}
+      <div className="absolute top-20 left-10 w-72 h-72 expensive-gradient rounded-full opacity-20 blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 luxury-gradient rounded-full opacity-15 blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] accent-gradient rounded-full opacity-10 blur-3xl animate-pulse delay-2000" />
 
       {/* Header */}
-      <header className="relative z-10 border-b border-border/50 bg-background/80 backdrop-blur-md">
+      <header className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-                <Sparkles className="h-6 w-6 text-primary" />
+              <div className="p-2 rounded-xl glow-gradient border border-purple-500/30 shadow-2xl">
+                <Sparkles className="h-6 w-6 text-white animate-pulse-glow" />
               </div>
               <div>
-                <h1 className="text-xl font-bold premium-gradient bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold glow-gradient bg-clip-text text-transparent">
                   AI Code Builder
                 </h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">
+                <p className="text-xs text-gray-300 hidden sm:block">
                   Build with AI • Ship faster
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" className="hidden sm:flex">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden sm:flex text-gray-300 hover:text-white border-white/20 hover:border-white/40"
+              >
                 <Github className="h-4 w-4 mr-2" />
                 GitHub
               </Button>
@@ -84,6 +94,7 @@ const Index = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate("/editor")}
+                className="expensive-gradient text-white border-0 hover:opacity-90 shadow-lg"
               >
                 Open Editor
               </Button>
@@ -97,59 +108,64 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12 lg:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Sparkles className="h-4 w-4 text-primary animate-pulse-glow" />
-              <span className="text-sm font-medium text-primary">
-                Powered by AI
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full luxury-gradient border border-purple-400/30 mb-8 shadow-2xl">
+              <Sparkles className="h-5 w-5 text-purple-300 animate-pulse-glow" />
+              <span className="text-sm font-medium text-purple-100">
+                Powered by Advanced AI
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              <span className="premium-gradient bg-clip-text text-transparent">
-                Build web apps
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+              <span className="glow-gradient bg-clip-text text-transparent animate-pulse-glow">
+                Build Extraordinary
               </span>
               <br />
-              <span className="text-foreground">with just a prompt</span>
+              <span className="text-white drop-shadow-2xl">
+                Web Applications
+              </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Describe your idea and watch AI generate a complete web
-              application with modern frameworks, responsive design, and clean
-              code.
+            <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto mb-8 leading-relaxed">
+              Transform your ideas into stunning web applications with our
+              premium AI-powered platform. Experience the future of development.
             </p>
           </div>
 
           {/* Chat Interface */}
           <div className="mb-12 lg:mb-16">
-            <Card className="max-w-3xl mx-auto card-gradient border border-border/50 shadow-2xl backdrop-blur-sm">
+            <Card className="max-w-3xl mx-auto expensive-gradient border border-purple-500/30 shadow-2xl backdrop-blur-sm">
               <CardContent className="p-6 sm:p-8">
                 <div className="mb-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <Bot className="h-5 w-5 text-primary" />
+                    <div className="p-3 rounded-xl accent-gradient border border-purple-400/30 shadow-xl">
+                      <Bot className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">AI Assistant</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Ready to build your app
+                      <h3 className="font-semibold text-white text-lg">
+                        Elite AI Assistant
+                      </h3>
+                      <p className="text-sm text-purple-200">
+                        Ready to craft your masterpiece
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-muted/50 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Try one of these examples:
+                  <div className="luxury-gradient rounded-xl p-6 mb-6 border border-purple-500/20">
+                    <p className="text-sm text-purple-200 mb-4 font-medium">
+                      Experience premium AI generation:
                     </p>
-                    <div className="grid gap-2">
+                    <div className="grid gap-3">
                       {examplePrompts.map((prompt, index) => (
                         <button
                           key={index}
                           onClick={() => setChatInput(prompt)}
-                          className="text-left p-3 rounded-md bg-background/50 border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all text-sm group"
+                          className="text-left p-4 rounded-xl premium-dark-gradient border border-purple-400/20 hover:border-purple-300/40 hover:luxury-gradient transition-all text-sm group shadow-lg"
                         >
                           <div className="flex items-center justify-between">
-                            <span>{prompt}</span>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <span className="text-purple-100 font-medium">
+                              {prompt}
+                            </span>
+                            <ArrowRight className="h-4 w-4 text-purple-300 group-hover:text-white transition-colors group-hover:translate-x-1 transition-transform" />
                           </div>
                         </button>
                       ))}
@@ -162,31 +178,43 @@ const Index = () => {
                     <Input
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      placeholder="Describe the web app you want to build..."
-                      className="h-14 text-base pr-14 bg-background/80 border-border/50 focus:border-primary/50"
+                      placeholder="Describe your extraordinary vision..."
+                      className="h-16 text-base pr-16 luxury-gradient border-purple-400/30 focus:border-purple-300/60 text-white placeholder:text-purple-300/70 shadow-xl"
                     />
                     <Button
                       type="submit"
                       disabled={!chatInput.trim()}
                       size="icon"
-                      className="absolute right-2 top-2 h-10 w-10 premium-gradient"
+                      className="absolute right-2 top-2 h-12 w-12 glow-gradient hover:opacity-90 shadow-xl"
                     >
-                      <Send className="h-4 w-4" />
+                      <Send className="h-5 w-5" />
                     </Button>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge
+                      variant="secondary"
+                      className="text-xs expensive-gradient text-white border-0"
+                    >
                       React & TypeScript
                     </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      Tailwind CSS
+                    <Badge
+                      variant="secondary"
+                      className="text-xs accent-gradient text-white border-0"
+                    >
+                      Premium Components
                     </Badge>
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge
+                      variant="secondary"
+                      className="text-xs luxury-gradient text-white border-0"
+                    >
                       Responsive Design
                     </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      Modern Components
+                    <Badge
+                      variant="secondary"
+                      className="text-xs glow-gradient text-white border-0"
+                    >
+                      AI-Optimized
                     </Badge>
                   </div>
                 </form>
@@ -199,16 +227,16 @@ const Index = () => {
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="card-gradient border-border/50 hover:border-primary/30 transition-all group"
+                className="luxury-gradient border border-purple-500/30 hover:border-purple-400/50 transition-all group shadow-2xl"
               >
                 <CardContent className="p-6 text-center">
-                  <div className="p-3 rounded-xl bg-primary/10 inline-flex mb-4 group-hover:bg-primary/20 transition-colors">
-                    <div className="text-primary">{feature.icon}</div>
+                  <div className="p-4 rounded-xl expensive-gradient inline-flex mb-6 group-hover:glow-gradient transition-all shadow-xl border border-purple-400/20">
+                    <div className="text-white">{feature.icon}</div>
                   </div>
-                  <h3 className="font-semibold mb-2 text-lg">
+                  <h3 className="font-semibold mb-3 text-xl text-white">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-purple-200 text-sm leading-relaxed">
                     {feature.description}
                   </p>
                 </CardContent>
@@ -218,26 +246,26 @@ const Index = () => {
 
           {/* CTA Section */}
           <div className="text-center">
-            <div className="inline-flex flex-col sm:flex-row gap-3">
+            <div className="inline-flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="premium-gradient shadow-glow text-base px-8 h-12"
+                className="glow-gradient shadow-2xl text-base px-10 h-14 text-white border-0 hover:opacity-90 font-semibold"
                 onClick={() => navigate("/editor")}
               >
-                Start Building Now
-                <ArrowRight className="ml-2 h-4 w-4" />
+                Start Creating Magic
+                <ArrowRight className="ml-3 h-5 w-5" />
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="text-base px-8 h-12 border-border/50 hover:border-primary/50"
+                className="text-base px-10 h-14 expensive-gradient text-white border-purple-400/30 hover:border-purple-300/50"
               >
-                View Examples
+                Explore Premium Features
               </Button>
             </div>
 
-            <p className="text-xs text-muted-foreground mt-4">
-              No signup required • Generate unlimited projects
+            <p className="text-xs text-purple-300 mt-6 font-medium">
+              No limits • Unlimited premium generations • Enterprise-grade AI
             </p>
           </div>
         </div>
