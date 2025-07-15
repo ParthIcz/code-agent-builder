@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { ChatAgent } from "@/components/ChatAgent";
 import { CodeEditor } from "@/components/CodeEditor";
@@ -34,26 +34,6 @@ export default function Editor() {
     "chat",
   );
   const [chatOpen, setChatOpen] = useState(false);
-
-  // Load project files on mount
-  useEffect(() => {
-    loadProjectFiles();
-  }, []);
-
-  // Handle initial prompt from landing page
-  useEffect(() => {
-    const initialPrompt = location.state?.initialPrompt;
-    if (initialPrompt) {
-      // We'll call this after handleChatSubmit is defined
-      const timeoutId = setTimeout(() => {
-        // Check if handleChatSubmit exists before calling
-        if (typeof handleChatSubmit === "function") {
-          handleChatSubmit(initialPrompt);
-        }
-      }, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [location.state]); // Remove handleChatSubmit from dependencies
 
   const loadProjectFiles = async () => {
     try {
@@ -107,64 +87,67 @@ export default function Editor() {
     ]);
   };
 
-  const handleChatSubmit = async (message: string) => {
-    setIsGenerating(true);
+  const handleChatSubmit = useCallback(
+    async (message: string) => {
+      setIsGenerating(true);
 
-    // Add user message
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        type: "user",
-        content: message,
-        timestamp: new Date(),
-      },
-    ]);
-
-    try {
-      // Simulate AI response
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Add AI response
+      // Add user message
       setChatMessages((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
-          type: "assistant",
-          content: `I'll help you with that! Let me update the files accordingly.`,
+          type: "user",
+          content: message,
           timestamp: new Date(),
         },
       ]);
 
-      // Simulate file updates
-      setTimeout(() => {
-        const filesToUpdate = Object.keys(files).slice(0, 2);
-        filesToUpdate.forEach((filename) => {
-          setChatMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              type: "system",
-              content: `✅ Updated \`${filename}\``,
-              timestamp: new Date(),
-            },
-          ]);
-        });
-      }, 1000);
-    } catch (error) {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          type: "error",
-          content: `⚠️ Error: Failed to process request`,
-          timestamp: new Date(),
-        },
-      ]);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+      try {
+        // Simulate AI response
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Add AI response
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "assistant",
+            content: `I'll help you with that! Let me update the files accordingly.`,
+            timestamp: new Date(),
+          },
+        ]);
+
+        // Simulate file updates
+        setTimeout(() => {
+          const filesToUpdate = Object.keys(files).slice(0, 2);
+          filesToUpdate.forEach((filename) => {
+            setChatMessages((prev) => [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                type: "system",
+                content: `✅ Updated \`${filename}\``,
+                timestamp: new Date(),
+              },
+            ]);
+          });
+        }, 1000);
+      } catch (error) {
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "error",
+            content: `⚠️ Error: Failed to process request`,
+            timestamp: new Date(),
+          },
+        ]);
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [files],
+  );
 
   const handleDownload = async () => {
     try {
@@ -187,6 +170,21 @@ export default function Editor() {
     setTheme(newTheme);
     document.documentElement.classList.toggle("light", newTheme === "light");
   };
+
+  // Load project files on mount
+  useEffect(() => {
+    loadProjectFiles();
+  }, []);
+
+  // Handle initial prompt from landing page
+  useEffect(() => {
+    const initialPrompt = location.state?.initialPrompt;
+    if (initialPrompt) {
+      setTimeout(() => {
+        handleChatSubmit(initialPrompt);
+      }, 1000);
+    }
+  }, [location.state, handleChatSubmit]);
 
   return (
     <div className={`min-h-screen bg-background text-foreground ${theme}`}>
