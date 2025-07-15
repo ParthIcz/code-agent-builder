@@ -194,7 +194,7 @@ export default function Editor() {
       <div className="absolute inset-0 mesh-gradient opacity-20 pointer-events-none" />
       {/* Header */}
       <header className="border-b border-purple-500/30 expensive-gradient backdrop-blur-sm sticky top-0 z-50 shadow-luxury">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-3 relative z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button
