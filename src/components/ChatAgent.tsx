@@ -167,17 +167,27 @@ export function ChatAgent({
             >
               {message.type !== "user" && (
                 <div
-                  className={`p-1.5 rounded-lg flex-shrink-0 shadow-expensive ${
+                  className={`p-1.5 rounded-lg flex-shrink-0 shadow-sm ${
                     message.type === "assistant"
-                      ? "glow-gradient"
+                      ? "bg-gradient-to-br from-primary to-primary/70"
                       : message.type === "system"
-                        ? "expensive-gradient"
+                        ? "bg-gradient-to-br from-muted to-muted/70"
                         : message.type === "error"
-                          ? "bg-gradient-to-r from-red-900 to-red-800"
+                          ? "bg-gradient-to-br from-destructive to-destructive/70"
                           : "bg-muted"
                   }`}
                 >
-                  <div className="text-white">
+                  <div
+                    className={
+                      message.type === "assistant"
+                        ? "text-white"
+                        : message.type === "system"
+                          ? "text-muted-foreground"
+                          : message.type === "error"
+                            ? "text-destructive-foreground"
+                            : "text-muted-foreground"
+                    }
+                  >
                     {getMessageIcon(message.type)}
                   </div>
                 </div>
