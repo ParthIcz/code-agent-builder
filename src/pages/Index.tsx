@@ -53,10 +53,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden relative">
-      {/* Expensive mesh gradient background */}
-      <div className="absolute inset-0 mesh-gradient opacity-60" />
-      <div className="absolute inset-0 hero-gradient opacity-80" />
-      <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/60" />
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 hero-gradient opacity-30" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
 
       {/* Animated gradient orbs */}
       <div className="absolute top-20 left-10 w-72 h-72 expensive-gradient rounded-full opacity-20 blur-3xl animate-pulse" />
