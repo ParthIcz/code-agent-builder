@@ -85,31 +85,22 @@ export function ChatAgent({
       {/* Header */}
       <div className="flex-shrink-0 p-4 border-b border-border bg-card/50">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl glow-gradient border border-purple-400/40 shadow-luxury animate-pulse-glow">
-            <Bot className="h-6 w-6 text-white" />
+          <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+            <Bot className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-lg lg:text-xl text-white">
-              <span className="glow-gradient bg-clip-text text-transparent">
-                Elite AI Assistant
-              </span>
+            <h2 className="font-semibold text-base lg:text-lg truncate">
+              AI Assistant
             </h2>
-            <p className="text-xs sm:text-sm text-purple-200">
-              {isGenerating ? (
-                <span className="flex items-center gap-2">
-                  <Zap className="h-3 w-3 animate-pulse" />
-                  Crafting magic...
-                </span>
-              ) : (
-                "Ready to build extraordinary apps"
-              )}
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              {isGenerating ? "Generating..." : "Ready to help"}
             </p>
           </div>
           {isGenerating && (
             <div className="flex gap-1">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-              <div className="w-2 h-2 bg-purple-300 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-              <div className="w-2 h-2 bg-purple-200 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
             </div>
           )}
         </div>
