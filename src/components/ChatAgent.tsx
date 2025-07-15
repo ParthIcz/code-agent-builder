@@ -245,9 +245,9 @@ export function ChatAgent({
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Describe your premium vision..."
+                placeholder="Describe what you want to build..."
                 disabled={isGenerating}
-                className="flex-1 text-sm expensive-gradient border-purple-400/30 focus:border-purple-300/60 text-white placeholder:text-purple-300/70 shadow-luxury h-12 pr-14"
+                className="flex-1 text-sm bg-background/80 border-border/50 focus:border-primary/50 h-12 pr-14"
               />
               <Button
                 type="submit"
