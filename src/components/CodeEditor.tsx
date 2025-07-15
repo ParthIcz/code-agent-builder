@@ -436,6 +436,7 @@ export function CodeEditor({
         ...foldKeymap,
         ...completionKeymap,
       ]),
+      syntaxHighlighting(vsCodeHighlightStyle),
       vsCodeTheme,
       ...getLanguageExtension(selectedFile),
       EditorView.updateListener.of((update) => {
