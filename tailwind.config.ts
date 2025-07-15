@@ -24,9 +24,12 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				surface: 'hsl(var(--surface))',
+				'surface-elevated': 'hsl(var(--surface-elevated))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -50,17 +53,32 @@ export default {
 				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					foreground: 'hsl(var(--card-foreground))',
+					elevated: 'hsl(var(--card-elevated))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
+				chat: {
+					user: 'hsl(var(--chat-user))',
+					'user-foreground': 'hsl(var(--chat-user-foreground))',
+					assistant: 'hsl(var(--chat-assistant))',
+					'assistant-foreground': 'hsl(var(--chat-assistant-foreground))',
+					system: 'hsl(var(--chat-system))',
+					'system-foreground': 'hsl(var(--chat-system-foreground))',
+					error: 'hsl(var(--chat-error))',
+					'error-foreground': 'hsl(var(--chat-error-foreground))'
+				},
+				editor: {
+					background: 'hsl(var(--editor-background))',
+					sidebar: 'hsl(var(--editor-sidebar))',
+					active: 'hsl(var(--editor-active))',
+					hover: 'hsl(var(--editor-hover))'
 				}
 			},
 			borderRadius: {

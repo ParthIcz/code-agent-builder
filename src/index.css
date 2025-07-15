@@ -2,95 +2,146 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* Premium AI Code Builder Design System */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
+    /* Premium Dark Theme - Main Colors */
+    --background: 225 15% 8%;
+    --foreground: 210 40% 98%;
+    --surface: 225 15% 10%;
+    --surface-elevated: 225 15% 12%;
+    
+    /* Cards & Surfaces */
+    --card: 225 15% 10%;
+    --card-foreground: 210 40% 98%;
+    --card-elevated: 225 15% 12%;
+    
+    /* Popover & Dialogs */
+    --popover: 225 15% 10%;
+    --popover-foreground: 210 40% 98%;
+    
+    /* Brand Colors */
+    --primary: 260 100% 70%;
+    --primary-foreground: 225 15% 8%;
+    --primary-glow: 260 100% 80%;
+    
+    /* Secondary & Accent */
+    --secondary: 225 15% 15%;
+    --secondary-foreground: 210 40% 98%;
+    --accent: 280 100% 70%;
+    --accent-foreground: 225 15% 8%;
+    
+    /* Muted Elements */
+    --muted: 225 15% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 225 15% 8%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
+    
+    /* Borders & Inputs */
+    --border: 225 15% 20%;
+    --input: 225 15% 15%;
+    --ring: 260 100% 70%;
+    
+    /* Chat Colors */
+    --chat-user: 260 100% 70%;
+    --chat-user-foreground: 225 15% 8%;
+    --chat-assistant: 225 15% 15%;
+    --chat-assistant-foreground: 210 40% 98%;
+    --chat-system: 142 76% 36%;
+    --chat-system-foreground: 210 40% 98%;
+    --chat-error: 0 84.2% 60.2%;
+    --chat-error-foreground: 210 40% 98%;
+    
+    /* Code Editor */
+    --editor-background: 225 15% 8%;
+    --editor-sidebar: 225 15% 10%;
+    --editor-active: 225 15% 15%;
+    --editor-hover: 225 15% 12%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-surface: linear-gradient(135deg, hsl(var(--surface)), hsl(var(--surface-elevated)));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(var(--card-elevated)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--accent) / 0.2));
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px hsl(var(--primary) / 0.1);
+    --shadow-md: 0 4px 12px hsl(var(--primary) / 0.15);
+    --shadow-lg: 0 8px 24px hsl(var(--primary) / 0.2);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --radius: 0.75rem;
+  }
+  
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --surface: 0 0% 98%;
+    --surface-elevated: 0 0% 96%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --card-elevated: 0 0% 98%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    
+    --primary: 260 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 260 100% 70%;
+    
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --accent: 280 100% 60%;
+    --accent-foreground: 0 0% 100%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --ring: 260 100% 60%;
+    
+    --chat-user: 260 100% 60%;
+    --chat-user-foreground: 0 0% 100%;
+    --chat-assistant: 210 40% 96.1%;
+    --chat-assistant-foreground: 222.2 84% 4.9%;
+    --chat-system: 142 76% 36%;
+    --chat-system-foreground: 0 0% 100%;
+    --chat-error: 0 84.2% 60.2%;
+    --chat-error-foreground: 0 0% 100%;
+    
+    --editor-background: 0 0% 100%;
+    --editor-sidebar: 0 0% 98%;
+    --editor-active: 210 40% 96.1%;
+    --editor-hover: 0 0% 96%;
+    
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-surface: linear-gradient(135deg, hsl(var(--surface)), hsl(var(--surface-elevated)));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(var(--card-elevated)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.1));
+    
+    --shadow-sm: 0 2px 4px hsl(222.2 84% 4.9% / 0.1);
+    --shadow-md: 0 4px 12px hsl(222.2 84% 4.9% / 0.15);
+    --shadow-lg: 0 8px 24px hsl(222.2 84% 4.9% / 0.2);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
   }
 }
 
@@ -98,8 +149,99 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
+  
+  html {
+    @apply dark;
+  }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    transition: var(--transition-smooth);
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/70;
+  }
+}
+
+@layer components {
+  .premium-gradient {
+    background: var(--gradient-primary);
+  }
+  
+  .surface-gradient {
+    background: var(--gradient-surface);
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
+  }
+  
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .shadow-premium {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
+    }
   }
 }
