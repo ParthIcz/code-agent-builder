@@ -5,7 +5,12 @@ import { CodeEditor } from "@/components/CodeEditor";
 import { LivePreview } from "@/components/LivePreview";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   Download,
   Play,
