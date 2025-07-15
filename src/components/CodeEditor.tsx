@@ -280,8 +280,6 @@ export function CodeEditor({
       closeBrackets(),
       autocompletion(),
       rectangularSelection(),
-      highlightSelectionMatches(),
-      searchHighlight(),
       keymap.of([
         ...closeBracketsKeymap,
         ...defaultKeymap,
