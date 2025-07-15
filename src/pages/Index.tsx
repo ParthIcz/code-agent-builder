@@ -57,10 +57,9 @@ const Index = () => {
       <div className="absolute inset-0 hero-gradient opacity-30" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
 
-      {/* Animated gradient orbs */}
-      <div className="absolute top-20 left-10 w-72 h-72 expensive-gradient rounded-full opacity-20 blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 luxury-gradient rounded-full opacity-15 blur-3xl animate-pulse delay-1000" />
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] accent-gradient rounded-full opacity-10 blur-3xl animate-pulse delay-2000" />
+      {/* Subtle animated gradient orbs */}
+      <div className="absolute top-20 left-10 w-72 h-72 premium-gradient rounded-full opacity-10 blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 premium-gradient rounded-full opacity-8 blur-3xl animate-pulse delay-1000" />
 
       {/* Header */}
       <header className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-md">
