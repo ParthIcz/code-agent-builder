@@ -224,20 +224,18 @@ export function ChatAgent({
 
           {isGenerating && (
             <div className="flex items-start gap-2 sm:gap-3 animate-pulse">
-              <div className="p-1.5 rounded-lg glow-gradient flex-shrink-0 shadow-luxury animate-pulse-glow">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex-shrink-0 shadow-sm">
                 <Bot className="h-4 w-4 text-white" />
               </div>
-              <Card className="luxury-gradient text-white max-w-[80%] mr-4 shadow-expensive border border-purple-500/20 backdrop-blur-sm">
+              <Card className="bg-gradient-to-r from-card to-card-elevated text-foreground max-w-[80%] mr-4 shadow-sm border border-primary/10">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center gap-2 text-xs sm:text-sm">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-purple-300 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                      <div className="w-2 h-2 bg-purple-200 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                      <div className="w-2 h-2 bg-purple-100 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                      <div className="w-2 h-2 bg-primary/80 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                      <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"></div>
                     </div>
-                    <span className="text-purple-100">
-                      Generating premium code...
-                    </span>
+                    <span>Thinking...</span>
                   </div>
                 </CardContent>
               </Card>
