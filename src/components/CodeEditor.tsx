@@ -256,6 +256,83 @@ export function CodeEditor({
       ".cm-completionDetail": {
         color: "#9d9d9d",
       },
+      // Syntax highlighting colors (VS Code style)
+      ".cm-keyword": {
+        color: "#569cd6", // VS Code blue for keywords
+      },
+      ".cm-string, .cm-string2": {
+        color: "#ce9178", // VS Code orange for strings
+      },
+      ".cm-comment": {
+        color: "#6a9955", // VS Code green for comments
+        fontStyle: "italic",
+      },
+      ".cm-number": {
+        color: "#b5cea8", // VS Code light green for numbers
+      },
+      ".cm-operator": {
+        color: "#d4d4d4", // Default text color for operators
+      },
+      ".cm-punctuation": {
+        color: "#d4d4d4", // Default text color for punctuation
+      },
+      ".cm-bracket": {
+        color: "#ffd700", // Gold for brackets
+      },
+      ".cm-tag": {
+        color: "#569cd6", // Blue for HTML tags
+      },
+      ".cm-attribute": {
+        color: "#9cdcfe", // Light blue for attributes
+      },
+      ".cm-property": {
+        color: "#9cdcfe", // Light blue for CSS properties
+      },
+      ".cm-function, .cm-method": {
+        color: "#dcdcaa", // Yellow for functions
+      },
+      ".cm-variable": {
+        color: "#9cdcfe", // Light blue for variables
+      },
+      ".cm-variableName": {
+        color: "#9cdcfe", // Light blue for variable names
+      },
+      ".cm-type, .cm-typeName": {
+        color: "#4ec9b0", // Teal for types
+      },
+      ".cm-className": {
+        color: "#4ec9b0", // Teal for class names
+      },
+      ".cm-constant": {
+        color: "#569cd6", // Blue for constants
+      },
+      ".cm-definition": {
+        color: "#dcdcaa", // Yellow for definitions
+      },
+      ".cm-regexp": {
+        color: "#d16969", // Red for regex
+      },
+      ".cm-escape": {
+        color: "#d7ba7d", // Light yellow for escape characters
+      },
+      ".cm-meta": {
+        color: "#569cd6", // Blue for meta
+      },
+      ".cm-qualifier": {
+        color: "#d4d4d4", // Default for qualifiers
+      },
+      ".cm-builtin": {
+        color: "#569cd6", // Blue for built-ins
+      },
+      ".cm-bracket": {
+        color: "#d4d4d4", // Default for brackets
+      },
+      ".cm-atom": {
+        color: "#569cd6", // Blue for atoms
+      },
+      ".cm-unit": {
+        color: "#b5cea8", // Light green for units
+      },
     },
     { dark: true },
   );
