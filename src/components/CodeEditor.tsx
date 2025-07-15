@@ -390,9 +390,6 @@ export function CodeEditor({
       ".cm-builtin": {
         color: "#569cd6", // Blue for built-ins
       },
-      ".cm-bracket": {
-        color: "#d4d4d4", // Default for brackets
-      },
       ".cm-atom": {
         color: "#569cd6", // Blue for atoms
       },
