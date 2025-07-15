@@ -6,7 +6,6 @@ import {
   highlightSpecialChars,
   dropCursor,
   rectangularSelection,
-  highlightSelectionMatches,
   keymap,
 } from "@codemirror/view";
 import { EditorState, Extension } from "@codemirror/state";
@@ -17,10 +16,7 @@ import {
   foldKeymap,
 } from "@codemirror/language";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-import {
-  searchKeymap,
-  highlightSelectionMatches as searchHighlight,
-} from "@codemirror/search";
+import { searchKeymap } from "@codemirror/search";
 import {
   autocompletion,
   completionKeymap,
