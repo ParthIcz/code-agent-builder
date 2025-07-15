@@ -44,11 +44,16 @@ export default function Editor() {
   useEffect(() => {
     const initialPrompt = location.state?.initialPrompt;
     if (initialPrompt) {
-      setTimeout(() => {
-        handleChatSubmit(initialPrompt);
+      // We'll call this after handleChatSubmit is defined
+      const timeoutId = setTimeout(() => {
+        // Check if handleChatSubmit exists before calling
+        if (typeof handleChatSubmit === "function") {
+          handleChatSubmit(initialPrompt);
+        }
       }, 1000);
+      return () => clearTimeout(timeoutId);
     }
-  }, [location.state, handleChatSubmit]);
+  }, [location.state]); // Remove handleChatSubmit from dependencies
 
   const loadProjectFiles = async () => {
     try {
