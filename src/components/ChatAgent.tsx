@@ -81,9 +81,9 @@ export function ChatAgent({
   };
 
   return (
-    <div className="flex flex-col h-full expensive-gradient">
-      {/* Gradient Background Overlay */}
-      <div className="absolute inset-0 mesh-gradient opacity-30 pointer-events-none" />
+    <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm relative">
+      {/* Subtle gradient background overlay */}
+      <div className="absolute inset-0 expensive-gradient opacity-5 pointer-events-none" />
 
       {/* Header */}
       <div className="relative z-10 p-4 border-b border-purple-500/30 luxury-gradient shadow-expensive">
