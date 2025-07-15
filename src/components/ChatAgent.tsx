@@ -81,12 +81,9 @@ export function ChatAgent({
   };
 
   return (
-    <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm relative">
-      {/* Subtle gradient background overlay */}
-      <div className="absolute inset-0 expensive-gradient opacity-5 pointer-events-none" />
-
+    <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm">
       {/* Header */}
-      <div className="relative z-10 p-4 border-b border-border bg-card/50">
+      <div className="flex-shrink-0 p-4 border-b border-border bg-card/50">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl glow-gradient border border-purple-400/40 shadow-luxury animate-pulse-glow">
             <Bot className="h-6 w-6 text-white" />
