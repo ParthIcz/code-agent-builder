@@ -213,7 +213,7 @@ export function ChatAgent({
               </div>
 
               {message.type === "user" && (
-                <div className="p-1.5 rounded-lg accent-gradient flex-shrink-0 shadow-luxury">
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex-shrink-0 shadow-sm">
                   <div className="text-white">
                     {getMessageIcon(message.type)}
                   </div>
