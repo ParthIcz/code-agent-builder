@@ -107,7 +107,7 @@ export function ChatAgent({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-2 sm:p-4 relative z-10">
+      <ScrollArea className="flex-1 min-h-0 p-2 sm:p-4">
         <div className="space-y-3 sm:space-y-4">
           {messages.length === 0 && (
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 mx-2 sm:mx-0">
