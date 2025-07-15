@@ -83,15 +83,15 @@
     --gradient-premium: linear-gradient(
       135deg,
       #0c0a09,
-      #1c1917,
-      #451a03,
-      #7c2d12,
-      #dc2626
+      #1e1b4b,
+      #312e81,
+      #4c1d95,
+      #6b21a8
     );
     --gradient-hero: linear-gradient(
       135deg,
       #020617,
-      #0c0a09,
+      #1e293b,
       #1e1b4b,
       #581c87,
       #7c1d6f
