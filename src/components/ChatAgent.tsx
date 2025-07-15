@@ -253,7 +253,7 @@ export function ChatAgent({
                 type="submit"
                 disabled={!input.trim() || isGenerating}
                 size="icon"
-                className="absolute right-1 top-1 h-10 w-10 glow-gradient hover:opacity-90 shadow-luxury"
+                className="absolute right-1 top-1 h-10 w-10 premium-gradient"
               >
                 <Send className="h-4 w-4" />
               </Button>
