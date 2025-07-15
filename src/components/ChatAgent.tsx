@@ -86,7 +86,7 @@ export function ChatAgent({
       <div className="absolute inset-0 expensive-gradient opacity-5 pointer-events-none" />
 
       {/* Header */}
-      <div className="relative z-10 p-4 border-b border-purple-500/30 luxury-gradient shadow-expensive">
+      <div className="relative z-10 p-4 border-b border-border bg-card/50">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl glow-gradient border border-purple-400/40 shadow-luxury animate-pulse-glow">
             <Bot className="h-6 w-6 text-white" />
