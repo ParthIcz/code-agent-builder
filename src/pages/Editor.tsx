@@ -286,6 +286,7 @@ export default function Editor() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-80 p-0">
+                  <SheetTitle className="sr-only">AI Chat Assistant</SheetTitle>
                   <ChatAgent
                     messages={chatMessages}
                     onSubmit={handleChatSubmit}
