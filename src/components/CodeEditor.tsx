@@ -179,6 +179,70 @@ export function CodeEditor({
     }
   };
 
+  // VS Code syntax highlighting style
+  const vsCodeHighlightStyle = HighlightStyle.define([
+    { tag: tags.keyword, color: "#569cd6" },
+    {
+      tag: [
+        tags.name,
+        tags.deleted,
+        tags.character,
+        tags.propertyName,
+        tags.macroName,
+      ],
+      color: "#9cdcfe",
+    },
+    {
+      tag: [tags.function(tags.variableName), tags.labelName],
+      color: "#dcdcaa",
+    },
+    {
+      tag: [tags.color, tags.constant(tags.name), tags.standard(tags.name)],
+      color: "#4fc1ff",
+    },
+    { tag: [tags.definition(tags.name), tags.separator], color: "#d4d4d4" },
+    {
+      tag: [
+        tags.typeName,
+        tags.className,
+        tags.number,
+        tags.changed,
+        tags.annotation,
+        tags.modifier,
+        tags.self,
+        tags.namespace,
+      ],
+      color: "#4ec9b0",
+    },
+    {
+      tag: [
+        tags.operator,
+        tags.operatorKeyword,
+        tags.url,
+        tags.escape,
+        tags.regexp,
+        tags.link,
+        tags.special(tags.string),
+      ],
+      color: "#d4d4d4",
+    },
+    { tag: [tags.meta, tags.comment], color: "#6a9955", fontStyle: "italic" },
+    { tag: tags.strong, fontWeight: "bold" },
+    { tag: tags.emphasis, fontStyle: "italic" },
+    { tag: tags.strikethrough, textDecoration: "line-through" },
+    { tag: tags.link, color: "#6a9955", textDecoration: "underline" },
+    { tag: tags.heading, fontWeight: "bold", color: "#569cd6" },
+    {
+      tag: [tags.atom, tags.bool, tags.special(tags.variableName)],
+      color: "#569cd6",
+    },
+    {
+      tag: [tags.processingInstruction, tags.string, tags.inserted],
+      color: "#ce9178",
+    },
+    { tag: tags.invalid, color: "#f44747" },
+  ]);
+
   // VS Code-like theme
   const vsCodeTheme = EditorView.theme(
     {
