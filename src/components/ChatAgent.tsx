@@ -145,10 +145,10 @@ export function ChatAgent({
                         className="block w-full p-3 rounded-xl bg-gradient-to-r from-muted to-muted/50 border border-primary/20 hover:border-primary/40 hover:from-primary/10 hover:to-primary/5 transition-all text-left shadow-sm group"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-purple-100 font-medium">
+                          <span className="text-foreground font-medium">
                             {prompt}
                           </span>
-                          <Sparkles className="h-4 w-4 text-purple-300 group-hover:text-white transition-colors" />
+                          <Sparkles className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                         </div>
                       </button>
                     ))}
