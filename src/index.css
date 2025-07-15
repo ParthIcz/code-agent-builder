@@ -340,6 +340,10 @@
     animation: pulseGlow 2s ease-in-out infinite;
   }
 
+  .animate-expensive-glow {
+    animation: expensiveGlow 3s ease-in-out infinite;
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
