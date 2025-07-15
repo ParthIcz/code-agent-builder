@@ -113,17 +113,15 @@ export function ChatAgent({
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 mx-2 sm:mx-0">
               <CardContent className="p-4 sm:p-6">
                 <div className="text-center">
-                  <div className="p-4 rounded-xl glow-gradient inline-flex mb-4 shadow-luxury animate-expensive-glow">
-                    <Sparkles className="h-10 w-10 text-white" />
+                  <div className="p-3 rounded-xl bg-primary/10 inline-flex mb-4">
+                    <Sparkles className="h-8 w-8 text-primary animate-pulse-glow" />
                   </div>
                   <h3 className="font-semibold mb-3 text-base sm:text-lg">
-                    <span className="glow-gradient bg-clip-text text-transparent">
-                      Welcome to Elite AI Builder
-                    </span>
+                    Welcome to AI Code Builder
                   </h3>
-                  <p className="text-xs sm:text-sm text-purple-200 mb-4 leading-relaxed">
-                    I'll help you craft exceptional web applications. Try these
-                    premium commands:
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4 leading-relaxed">
+                    I'll help you build and modify your project. Try commands
+                    like:
                   </p>
                   <div className="space-y-2 text-xs sm:text-sm">
                     {quickPrompts.map((prompt, index) => (
