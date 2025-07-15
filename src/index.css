@@ -245,6 +245,18 @@
     background: var(--gradient-primary);
   }
 
+  .expensive-gradient {
+    background: var(--gradient-expensive);
+  }
+
+  .luxury-gradient {
+    background: var(--gradient-luxury);
+  }
+
+  .premium-dark-gradient {
+    background: var(--gradient-premium);
+  }
+
   .surface-gradient {
     background: var(--gradient-surface);
   }
@@ -255,6 +267,18 @@
 
   .hero-gradient {
     background: var(--gradient-hero);
+  }
+
+  .accent-gradient {
+    background: var(--gradient-accent);
+  }
+
+  .glow-gradient {
+    background: var(--gradient-glow);
+  }
+
+  .mesh-gradient {
+    background: var(--gradient-mesh);
   }
 
   .shadow-premium {
