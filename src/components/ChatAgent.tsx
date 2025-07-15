@@ -234,7 +234,7 @@ export function ChatAgent({
       </ScrollArea>
 
       {/* Input Section */}
-      <div className="relative z-10 p-3 sm:p-4 border-t border-border bg-card/50">
+      <div className="flex-shrink-0 p-3 sm:p-4 border-t border-border bg-card/50">
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex gap-2">
             <div className="relative flex-1">
