@@ -68,13 +68,13 @@ export function ChatAgent({
   const getMessageStyle = (type: ChatMessage["type"]) => {
     switch (type) {
       case "user":
-        return "glow-gradient text-white ml-4 shadow-luxury";
+        return "bg-chat-user text-chat-user-foreground ml-4";
       case "assistant":
-        return "luxury-gradient text-white mr-4 shadow-expensive border border-purple-500/20";
+        return "bg-chat-assistant text-chat-assistant-foreground mr-4 border border-primary/10";
       case "system":
-        return "expensive-gradient text-white mx-4 shadow-luxury border border-blue-500/20";
+        return "bg-chat-system text-chat-system-foreground mx-4";
       case "error":
-        return "bg-gradient-to-r from-red-900 to-red-800 text-white mx-4 shadow-lg border border-red-500/30";
+        return "bg-chat-error text-chat-error-foreground mx-4";
       default:
         return "bg-muted text-muted-foreground mx-4";
     }
