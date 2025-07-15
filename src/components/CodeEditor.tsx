@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { EditorView } from '@codemirror/view';
+import { EditorView, lineNumbers } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { basicSetup } from '@codemirror/basic-setup';
+import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { json } from '@codemirror/lang-json';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -131,9 +130,27 @@ export function CodeEditor({ files, selectedFile, onFileSelect, onFileUpdate }: 
     const state = EditorState.create({
       doc: currentFile.content,
       extensions: [
-        basicSetup,
+        lineNumbers(),
+        syntaxHighlighting(defaultHighlightStyle),
         getLanguage(selectedFile),
-        oneDark,
+        EditorView.theme({
+          "&": {
+            fontSize: "14px",
+            height: "100%",
+            backgroundColor: "#1e293b"
+          },
+          ".cm-content": {
+            padding: "16px",
+            minHeight: "100%",
+            color: "#e2e8f0"
+          },
+          ".cm-focused": {
+            outline: "none"
+          },
+          ".cm-line": {
+            color: "#e2e8f0"
+          }
+        }),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onFileUpdate(selectedFile, update.state.doc.toString());
