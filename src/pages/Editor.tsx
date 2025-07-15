@@ -211,7 +211,7 @@ export default function Editor() {
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate("/")}
-                  className="gap-2"
+                  className="gap-2 text-purple-200 hover:text-white hover:expensive-gradient"
                 >
                   <Home className="h-4 w-4" />
                   Home
