@@ -48,7 +48,7 @@ export default function Editor() {
         handleChatSubmit(initialPrompt);
       }, 1000);
     }
-  }, [location.state]);
+  }, [location.state, handleChatSubmit]);
 
   const loadProjectFiles = async () => {
     try {
