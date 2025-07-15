@@ -188,10 +188,10 @@ export default function Editor() {
 
   return (
     <div
-      className={`min-h-screen luxury-gradient text-foreground ${theme} relative`}
+      className={`min-h-screen bg-background text-foreground ${theme} relative`}
     >
-      {/* Gradient background overlay */}
-      <div className="absolute inset-0 mesh-gradient opacity-20 pointer-events-none" />
+      {/* Subtle gradient background overlay */}
+      <div className="absolute inset-0 luxury-gradient opacity-10 pointer-events-none" />
       {/* Header */}
       <header className="border-b border-purple-500/30 expensive-gradient backdrop-blur-sm sticky top-0 z-50 shadow-luxury">
         <div className="container mx-auto px-4 py-3 relative z-10">
