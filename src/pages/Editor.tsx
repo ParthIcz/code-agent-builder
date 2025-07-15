@@ -215,7 +215,7 @@ export default function Editor() {
                 <div className="w-px h-4 bg-border" />
               </div>
 
-              <h1 className="text-xl lg:text-2xl font-bold premium-gradient bg-clip-text text-transparent">
+              <h1 className="text-xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
                 AI Code Builder
               </h1>
               <div className="hidden sm:block text-sm text-muted-foreground">
