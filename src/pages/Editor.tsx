@@ -294,7 +294,7 @@ export default function Editor() {
       </header>
 
       {/* Main Layout */}
-      <div className="flex h-[calc(100vh-73px)]">
+      <div className="flex h-[calc(100vh-73px)] relative z-10">
         {/* Desktop: Left Panel - Chat Agent */}
         <div className="hidden lg:block w-80 xl:w-96 border-r border-border bg-card/30">
           <ChatAgent
