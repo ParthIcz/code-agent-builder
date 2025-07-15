@@ -267,7 +267,7 @@ export function ChatAgent({
                 key={index}
                 variant="outline"
                 size="sm"
-                className="text-xs h-8 px-3 expensive-gradient text-white border-purple-400/30 hover:border-purple-300/50 hover:glow-gradient shadow-expensive"
+                className="text-xs h-8 px-3 border-border/50 hover:border-primary/50"
                 onClick={() => setInput(prompt)}
                 disabled={isGenerating}
               >
