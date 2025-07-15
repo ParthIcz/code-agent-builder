@@ -142,7 +142,7 @@ export function ChatAgent({
                       <button
                         key={index}
                         onClick={() => setInput(prompt)}
-                        className="block w-full p-3 rounded-xl luxury-gradient border border-purple-400/20 hover:border-purple-300/40 hover:glow-gradient transition-all text-left shadow-expensive group"
+                        className="block w-full p-3 rounded-xl bg-gradient-to-r from-muted to-muted/50 border border-primary/20 hover:border-primary/40 hover:from-primary/10 hover:to-primary/5 transition-all text-left shadow-sm group"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-purple-100 font-medium">
