@@ -184,7 +184,7 @@ export function ChatAgent({
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="font-semibold text-base lg:text-lg truncate">
-              AI Assistant
+              Gemini AI Assistant
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
               {isGenerating || isAIGenerating
