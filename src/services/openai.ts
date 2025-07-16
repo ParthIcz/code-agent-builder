@@ -41,32 +41,57 @@ class OpenAIService {
   }
 
   private async callOpenAI(messages: OpenAIMessage[]): Promise<string> {
-    try {
-      const response = await axios.post(
-        OPENAI_API_URL,
-        {
-          model: "gpt-4",
-          messages,
-          max_tokens: 4000,
-          temperature: 0.7,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
+    const models = ["gpt-3.5-turbo", "gpt-4"];
+    let lastError: Error | null = null;
 
-      return response.data.choices[0].message.content;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
+    for (const model of models) {
+      try {
+        const response = await axios.post(
+          OPENAI_API_URL,
+          {
+            model,
+            messages,
+            max_tokens: 4000,
+            temperature: 0.7,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${this.apiKey}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        return response.data.choices[0].message.content;
+      } catch (error) {
+        lastError = error as Error;
+        if (axios.isAxiosError(error)) {
+          const errorMessage =
+            error.response?.data?.error?.message || error.message;
+          console.warn(`Model ${model} failed: ${errorMessage}`);
+
+          // If it's not a model access issue, don't try other models
+          if (
+            !errorMessage.includes("does not exist") &&
+            !errorMessage.includes("access")
+          ) {
+            throw new Error(`OpenAI API error: ${errorMessage}`);
+          }
+        }
+      }
+    }
+
+    // If all models failed, throw the last error
+    if (lastError) {
+      if (axios.isAxiosError(lastError)) {
         throw new Error(
-          `OpenAI API error: ${error.response?.data?.error?.message || error.message}`,
+          `OpenAI API error: ${lastError.response?.data?.error?.message || lastError.message}`,
         );
       }
       throw new Error("Failed to call OpenAI API");
     }
+
+    throw new Error("No models available");
   }
 
   async generateProject(
