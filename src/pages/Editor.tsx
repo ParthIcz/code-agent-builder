@@ -148,7 +148,7 @@ export default function Editor() {
           {
             id: Date.now().toString(),
             type: "error",
-            content: `⚠️ Error: Failed to process request`,
+            content: `��️ Error: Failed to process request`,
             timestamp: new Date(),
           },
         ]);
@@ -323,7 +323,10 @@ export default function Editor() {
               />
             </ResizablePanel>
 
-            <ResizableHandle className="w-1 bg-border hover:bg-border/80 transition-colors" />
+            <ResizableHandle
+              withHandle
+              className="w-2 bg-border/50 hover:bg-primary/20 transition-colors duration-200"
+            />
 
             {/* Code Editor Panel */}
             <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
@@ -335,7 +338,10 @@ export default function Editor() {
               />
             </ResizablePanel>
 
-            <ResizableHandle className="w-1 bg-border hover:bg-border/80 transition-colors" />
+            <ResizableHandle
+              withHandle
+              className="w-2 bg-border/50 hover:bg-primary/20 transition-colors duration-200"
+            />
 
             {/* Live Preview Panel */}
             <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
