@@ -1,22 +1,22 @@
-# AI Code Builder Setup
+# Gemini Code Builder Setup
 
-## OpenAI API Configuration
+## Google Gemini API Configuration
 
-To use the AI code generation features, you need to set up your OpenAI API key:
+To use the AI code generation features, you need to set up your Google Gemini API key:
 
-### 1. Get OpenAI API Key
+### 1. Get Gemini API Key
 
-- Go to [OpenAI API Keys](https://platform.openai.com/api-keys)
-- Sign in or create an account
-- Create a new API key
-- Copy the key (starts with `sk-...`)
+- Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+- Sign in with your Google account
+- Create a new API key (free tier available)
+- Copy the key (starts with `AIza...`)
 
 ### 2. Configure Environment Variables
 
 - Open `.env.local` file in the root directory
-- Replace `your-openai-api-key-here` with your actual API key:
+- Replace `your-gemini-api-key-here` with your actual API key:
   ```
-  VITE_OPENAI_API_KEY=sk-your-actual-api-key-here
+  VITE_GEMINI_API_KEY=your-actual-api-key-here
   ```
 
 ### 3. Start Development Server
