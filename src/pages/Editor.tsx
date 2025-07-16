@@ -360,6 +360,7 @@ export default function Editor() {
               messages={chatMessages}
               onSubmit={handleChatSubmit}
               isGenerating={isGenerating}
+              onProjectGenerated={handleProjectGenerated}
             />
           )}
           {activePanel === "code" && (
