@@ -252,7 +252,7 @@ export default function Editor() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate && navigate("/")}
                   className="gap-2 text-purple-200 hover:text-white hover:expensive-gradient"
                 >
                   <Home className="h-4 w-4" />
