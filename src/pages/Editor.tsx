@@ -233,7 +233,13 @@ export default function Editor() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate && navigate("/")}
+                onClick={() => {
+                  try {
+                    navigate("/");
+                  } catch (error) {
+                    window.location.href = "/";
+                  }
+                }}
                 className="lg:hidden"
               >
                 <Home className="h-4 w-4" />
