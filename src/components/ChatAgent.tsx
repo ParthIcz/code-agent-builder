@@ -51,10 +51,12 @@ export function ChatAgent({
   };
 
   const quickPrompts = [
-    "Add a hero section",
-    "Create a contact form",
-    "Make it responsive",
-    "Add dark mode toggle",
+    "Create a modern portfolio website with React and Tailwind CSS",
+    "Build a todo app with TypeScript and local storage",
+    "Generate a landing page for a SaaS product",
+    "Create a dashboard with charts and data visualization",
+    "Build an e-commerce product catalog",
+    "Generate a blog website with markdown support",
   ];
 
   const getMessageIcon = (type: ChatMessage["type"]) => {
