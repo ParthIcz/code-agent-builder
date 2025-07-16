@@ -221,10 +221,10 @@ export default function Editor() {
               </div>
 
               <h1 className="text-xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
-                AI Code Builder
+                Gemini Code Builder
               </h1>
               <div className="hidden sm:block text-sm text-muted-foreground">
-                Build with AI • Edit • Preview
+                Build with Gemini AI • Edit • Preview
               </div>
             </div>
 
