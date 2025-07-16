@@ -51,11 +51,36 @@ export function LivePreview({ files }: LivePreviewProps) {
   }, [files]);
 
   const generatePreviewHTML = (files: Record<string, ProjectFile>): string => {
-    // Find the main CSS file
-    const cssFile = files["app/globals.css"] || files["styles/globals.css"];
-    const cssContent = cssFile ? cssFile.content : "";
+    // If no files are generated yet, show empty state
+    if (!files || Object.keys(files).length === 0) {
+      return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Code Builder - Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+  <div class="text-center max-w-md mx-auto p-8">
+    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+    </div>
+    <h1 class="text-2xl font-bold mb-2">No Project Generated</h1>
+    <p class="text-gray-400 mb-4">Use the AI chat to generate your first project!</p>
+    <div class="text-sm text-gray-500">
+      Try: "Create a portfolio website" or "Build a todo app"
+    </div>
+  </div>
+</body>
+</html>`;
+    }
 
-    // Simple preview template
+    // Try to find and render the actual generated content
+    return renderGeneratedContent(files);
     return `
 <!DOCTYPE html>
 <html lang="en" class="dark">
