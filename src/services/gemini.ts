@@ -47,7 +47,14 @@ class GeminiService {
 
   private async callGemini(prompt: string): Promise<string> {
     try {
-      const response = await fetch(`${GEMINI_API_URL}?key=${this.apiKey}`, {
+      const apiUrl = `${GEMINI_API_URL}?key=${this.apiKey}`;
+      console.log("Making Gemini API request to:", GEMINI_API_URL);
+      console.log(
+        "API Key (first 10 chars):",
+        this.apiKey.substring(0, 10) + "...",
+      );
+
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
