@@ -40,7 +40,7 @@ npm run dev
 
 ## Features
 
-- **AI-Powered Generation**: Complete project generation with GPT-4
+- **AI-Powered Generation**: Complete project generation with Google Gemini
 - **Real-time Editing**: CodeMirror-based code editor with syntax highlighting
 - **Live Preview**: Instant preview of your changes
 - **Resizable Panels**: Adjustable workspace layout
