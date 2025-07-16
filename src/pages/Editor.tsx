@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { ChatAgent } from "@/components/ChatAgent";
 import { CodeEditor } from "@/components/CodeEditor";
@@ -35,6 +35,9 @@ import { useNavigate } from "react-router-dom";
 export default function Editor() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Counter to ensure unique message IDs
+  const messageIdRef = useRef(0);
   const [files, setFiles] = useState<Record<string, ProjectFile>>({});
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -108,7 +111,7 @@ export default function Editor() {
     setChatMessages((prev) => [
       ...prev,
       {
-        id: Date.now().toString(),
+        id: `msg-${++messageIdRef.current}-${Date.now()}`,
         type: "system",
         content: `🛠 Updated \`${filename}\``,
         timestamp: new Date(),
@@ -124,7 +127,7 @@ export default function Editor() {
       setChatMessages((prev) => [
         ...prev,
         {
-          id: Date.now().toString(),
+          id: `msg-${++messageIdRef.current}-${Date.now()}`,
           type: "user",
           content: message,
           timestamp: new Date(),
@@ -139,7 +142,7 @@ export default function Editor() {
         setChatMessages((prev) => [
           ...prev,
           {
-            id: Date.now().toString(),
+            id: `msg-${++messageIdRef.current}-${Date.now()}`,
             type: "assistant",
             content: `I'll help you with that! Let me update the files accordingly.`,
             timestamp: new Date(),
@@ -153,7 +156,7 @@ export default function Editor() {
             setChatMessages((prev) => [
               ...prev,
               {
-                id: Date.now().toString(),
+                id: `msg-${++messageIdRef.current}-${Date.now()}`,
                 type: "system",
                 content: `✅ Updated \`${filename}\``,
                 timestamp: new Date(),
@@ -165,7 +168,7 @@ export default function Editor() {
         setChatMessages((prev) => [
           ...prev,
           {
-            id: Date.now().toString(),
+            id: `msg-${++messageIdRef.current}-${Date.now()}`,
             type: "error",
             content: `⚠️ Error: Failed to process request`,
             timestamp: new Date(),
