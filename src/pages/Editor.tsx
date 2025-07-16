@@ -45,6 +45,17 @@ export default function Editor() {
   );
   const [chatOpen, setChatOpen] = useState(false);
 
+  // Panel size persistence
+  const [panelSizes, setPanelSizes] = useState(() => {
+    const saved = localStorage.getItem("editor-panel-sizes");
+    return saved ? JSON.parse(saved) : [25, 45, 30];
+  });
+
+  const handlePanelResize = (sizes: number[]) => {
+    setPanelSizes(sizes);
+    localStorage.setItem("editor-panel-sizes", JSON.stringify(sizes));
+  };
+
   const loadProjectFiles = async () => {
     try {
       const response = await fetch("/project.json");
@@ -148,7 +159,7 @@ export default function Editor() {
           {
             id: Date.now().toString(),
             type: "error",
-            content: `��️ Error: Failed to process request`,
+            content: `⚠️ Error: Failed to process request`,
             timestamp: new Date(),
           },
         ]);
