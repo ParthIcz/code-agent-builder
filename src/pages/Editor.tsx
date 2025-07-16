@@ -15,7 +15,7 @@ import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
-} from "react-resizable-panels";
+} from "@/components/ui/resizable";
 import {
   Download,
   Play,
