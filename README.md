@@ -1,6 +1,6 @@
-# 🤖 AI Code Builder
+# 🤖 Gemini Code Builder
 
-A powerful web-based IDE that uses OpenAI's GPT-4 to generate complete projects from natural language descriptions. Build full-stack applications, websites, and more with just a conversation!
+A powerful web-based IDE that uses Google's Gemini AI to generate complete projects from natural language descriptions. Build full-stack applications, websites, and more with just a conversation!
 
 ![AI Code Builder](https://img.shields.io/badge/AI-Powered-brightgreen) ![React](https://img.shields.io/badge/React-18+-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue) ![Tailwind](https://img.shields.io/badge/Tailwind-3+-blue)
 
