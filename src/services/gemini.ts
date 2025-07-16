@@ -108,24 +108,46 @@ class GeminiService {
 
       return data.candidates[0].content.parts[0].text;
     } catch (error) {
+      console.error("Gemini API Call Error:", error);
+
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        throw new Error(
+          `🌐 Network Error\n\nFailed to connect to Gemini API. Please check your internet connection and try again.\n\nError: ${error.message}`,
+        );
+      }
+
       if (error instanceof Error) {
         // Handle specific Gemini API errors
-        if (error.message.includes("API_KEY_INVALID")) {
+        if (
+          error.message.includes("API_KEY_INVALID") ||
+          error.message.includes("invalid")
+        ) {
           throw new Error(
             `🔑 Invalid Gemini API Key\n\nYour Gemini API key appears to be invalid. To fix this:\n\n1. Get a new API key at: https://makersuite.google.com/app/apikey\n2. Update your .env.local file: VITE_GEMINI_API_KEY=your-new-key\n3. Restart the development server\n\nError: ${error.message}`,
           );
         }
 
-        if (error.message.includes("RATE_LIMIT_EXCEEDED")) {
+        if (
+          error.message.includes("RATE_LIMIT_EXCEEDED") ||
+          error.message.includes("rate limit")
+        ) {
           throw new Error(
             `⏰ Rate Limit Exceeded\n\nYou're making requests too quickly. Please wait a moment and try again.\n\nError: ${error.message}`,
           );
         }
 
-        if (error.message.includes("quota")) {
+        if (
+          error.message.includes("quota") ||
+          error.message.includes("QUOTA")
+        ) {
           throw new Error(
             `🚫 Gemini Quota Exceeded\n\nYour API key has hit the usage limit. To fix this:\n\n1. Check your Google AI Studio usage at: https://makersuite.google.com/app/apikey\n2. Upgrade your plan if needed\n3. Or get a new API key\n4. Update your .env.local file with the new key\n5. Restart the development server\n\nError: ${error.message}`,
           );
+        }
+
+        // Pass through the original error if we already improved it
+        if (error.message.includes("Gemini API error:")) {
+          throw error;
         }
 
         throw new Error(`Gemini API error: ${error.message}`);
