@@ -242,7 +242,7 @@ export default function Editor() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate("/")}
+                onClick={() => navigate && navigate("/")}
                 className="lg:hidden"
               >
                 <Home className="h-4 w-4" />
