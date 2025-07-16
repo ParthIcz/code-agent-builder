@@ -33,18 +33,9 @@ import type { ProjectFile, ChatMessage } from "@/types";
 import { useNavigate } from "react-router-dom";
 
 export default function Editor() {
-  // Make router hooks more resilient to context issues
-  let location: any;
-  let navigate: any;
-
-  try {
-    location = useLocation();
-    navigate = useNavigate();
-  } catch (error) {
-    // Fallback for router context issues during hot reload
-    location = { state: null };
-    navigate = () => {};
-  }
+  // Always call hooks at the top level
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Counter to ensure unique message IDs
   const messageIdRef = useRef(0);
