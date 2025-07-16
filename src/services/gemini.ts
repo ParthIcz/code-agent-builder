@@ -79,19 +79,31 @@ class GeminiService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `Gemini API error: ${errorData.error?.message || response.statusText}`,
-        );
+        const errorMessage =
+          errorData.error?.message || response.statusText || "Unknown error";
+        console.error("Gemini API Error:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+        });
+        throw new Error(`Gemini API error: ${errorMessage}`);
       }
 
       const data = await response.json();
+      console.log("Gemini API Response:", data);
+
+      if (!data.candidates || !data.candidates[0]) {
+        console.error("No candidates in response:", data);
+        throw new Error("No response candidates from Gemini API");
+      }
 
       if (
-        !data.candidates ||
-        !data.candidates[0] ||
-        !data.candidates[0].content
+        !data.candidates[0].content ||
+        !data.candidates[0].content.parts ||
+        !data.candidates[0].content.parts[0]
       ) {
-        throw new Error("Invalid response format from Gemini API");
+        console.error("Invalid content structure:", data.candidates[0]);
+        throw new Error("Invalid content structure from Gemini API");
       }
 
       return data.candidates[0].content.parts[0].text;
