@@ -70,7 +70,7 @@ A powerful web-based IDE that uses Google's Gemini AI to generate complete proje
 ### Prerequisites
 
 - Node.js 18+ and npm
-- OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))
 
 ### Installation
 
@@ -190,7 +190,7 @@ src/
 │   ├── ChatAgent.tsx   # AI chat interface
 │   ├── CodeEditor.tsx  # Code editing interface
 │   └── LivePreview.tsx # Live preview component
-��── pages/              # Route components
+├── pages/              # Route components
 │   ├── Index.tsx       # Landing page
 │   ├── Editor.tsx      # Main editor interface
 │   └── NotFound.tsx    # 404 page
