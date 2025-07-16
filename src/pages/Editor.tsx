@@ -319,10 +319,14 @@ export default function Editor() {
       <div className="h-[calc(100vh-73px)] relative z-10">
         {/* Desktop: Resizable Panels */}
         <div className="hidden lg:block h-full">
-          <ResizablePanelGroup direction="horizontal" className="h-full">
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="h-full"
+            onLayout={handlePanelResize}
+          >
             {/* Chat Agent Panel */}
             <ResizablePanel
-              defaultSize={25}
+              defaultSize={panelSizes[0]}
               minSize={20}
               maxSize={40}
               className="bg-card/30"
