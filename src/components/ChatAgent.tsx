@@ -343,7 +343,7 @@ export function ChatAgent({
               />
               <Button
                 type="submit"
-                disabled={!input.trim() || isGenerating}
+                disabled={!input.trim() || isGenerating || isAIGenerating}
                 size="icon"
                 className="absolute right-1 top-1 h-10 w-10 premium-gradient"
               >
