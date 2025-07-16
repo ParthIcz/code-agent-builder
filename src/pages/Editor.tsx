@@ -47,13 +47,21 @@ export default function Editor() {
 
   // Panel size persistence
   const [panelSizes, setPanelSizes] = useState(() => {
-    const saved = localStorage.getItem("editor-panel-sizes");
-    return saved ? JSON.parse(saved) : [25, 45, 30];
+    try {
+      const saved = localStorage.getItem("editor-panel-sizes");
+      return saved ? JSON.parse(saved) : [25, 45, 30];
+    } catch {
+      return [25, 45, 30];
+    }
   });
 
   const handlePanelResize = (sizes: number[]) => {
     setPanelSizes(sizes);
-    localStorage.setItem("editor-panel-sizes", JSON.stringify(sizes));
+    try {
+      localStorage.setItem("editor-panel-sizes", JSON.stringify(sizes));
+    } catch {
+      // Silently fail if localStorage is not available
+    }
   };
 
   const loadProjectFiles = async () => {
