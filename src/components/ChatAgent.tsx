@@ -213,11 +213,11 @@ export function ChatAgent({
                     <Sparkles className="h-8 w-8 text-primary animate-pulse-glow" />
                   </div>
                   <h3 className="font-semibold mb-3 text-base sm:text-lg">
-                    Welcome to AI Code Builder
+                    Welcome to Gemini Code Builder
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-4 leading-relaxed">
-                    I'll help you build and modify your project. Try commands
-                    like:
+                    I'll help you build and modify your project using Google's
+                    Gemini AI. Try commands like:
                   </p>
                   <div className="space-y-2 text-xs sm:text-sm">
                     {quickPrompts.map((prompt, index) => (
