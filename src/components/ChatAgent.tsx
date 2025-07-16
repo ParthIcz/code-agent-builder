@@ -373,7 +373,7 @@ export function ChatAgent({
 
         <div className="text-xs text-purple-300 mt-3 text-center flex items-center justify-center gap-2">
           <Sparkles className="h-3 w-3" />
-          <span>Press Enter to send • Powered by Elite AI</span>
+          <span>Press Enter to send • Powered by Google Gemini</span>
           <Sparkles className="h-3 w-3" />
         </div>
       </div>
