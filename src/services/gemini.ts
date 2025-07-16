@@ -78,15 +78,44 @@ class GeminiService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage =
-          errorData.error?.message || response.statusText || "Unknown error";
-        console.error("Gemini API Error:", {
+        let errorData = {};
+        let errorText = "";
+
+        try {
+          errorData = await response.json();
+        } catch {
+          errorText = await response.text().catch(() => "No response body");
+        }
+
+        console.error("Gemini API Error Details:", {
           status: response.status,
           statusText: response.statusText,
           errorData,
+          errorText,
+          url: response.url,
         });
-        throw new Error(`Gemini API error: ${errorMessage}`);
+
+        // Extract error message from various possible structures
+        let errorMessage = "";
+        if (errorData && typeof errorData === "object") {
+          if (errorData.error?.message) {
+            errorMessage = errorData.error.message;
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          } else if (errorData.error) {
+            errorMessage = JSON.stringify(errorData.error);
+          } else {
+            errorMessage = JSON.stringify(errorData);
+          }
+        } else if (errorText) {
+          errorMessage = errorText;
+        } else {
+          errorMessage = response.statusText || `HTTP ${response.status}`;
+        }
+
+        throw new Error(
+          `Gemini API error (${response.status}): ${errorMessage}`,
+        );
       }
 
       const data = await response.json();
