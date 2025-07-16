@@ -118,11 +118,20 @@ export function ChatAgent({
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() && !isGenerating) {
-      onSubmit(input.trim());
+    if (input.trim() && !isGenerating && !isAIGenerating) {
+      const userMessage = input.trim();
       setInput("");
+
+      // First call the original onSubmit to add user message
+      onSubmit(userMessage);
+
+      // Then handle AI generation
+      const aiResponse = await handleAIGeneration(userMessage);
+
+      // Add AI response message
+      onSubmit(aiResponse);
     }
   };
 
