@@ -342,12 +342,29 @@ export function LivePreview({ files }: LivePreviewProps) {
   };
 
   const handleRefresh = () => {
-    // Force re-render
+    // Show loading state
+    setIsLoading(true);
+    setHasError(false);
     setPreviewContent("");
+
+    // Force re-render with delay
     setTimeout(() => {
-      const htmlContent = generatePreviewHTML(files);
-      setPreviewContent(htmlContent);
-    }, 100);
+      try {
+        console.log("Manual refresh triggered");
+        const htmlContent = generatePreviewHTML(files);
+        setPreviewContent(htmlContent);
+        setHasError(false);
+        setErrorMessage("");
+      } catch (error) {
+        console.error("Manual refresh error:", error);
+        setHasError(true);
+        setErrorMessage(
+          error instanceof Error ? error.message : "Preview generation failed",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300);
   };
 
   const handleOpenInNewTab = () => {
