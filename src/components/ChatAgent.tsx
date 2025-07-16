@@ -53,7 +53,7 @@ export function ChatAgent({
       };
 
       const generatedProject =
-        await openAIService.generateProject(projectRequest);
+        await geminiService.generateProject(projectRequest);
 
       // Convert generated project to ProjectFile format
       const projectFiles: Record<string, ProjectFile> = {};
