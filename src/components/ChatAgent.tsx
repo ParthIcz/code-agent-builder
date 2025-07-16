@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
-  openAIService,
+  geminiService,
   type ProjectGenerationRequest,
-} from "@/services/openai";
+} from "@/services/gemini";
 import type { ChatMessage, ProjectFile } from "@/types";
 
 interface ChatAgentProps {
