@@ -37,6 +37,82 @@ export function ChatAgent({
 }: ChatAgentProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isAIGenerating, setIsAIGenerating] = useState(false);
+
+  const handleAIGeneration = async (message: string) => {
+    setIsAIGenerating(true);
+
+    try {
+      // Parse the user message to extract project requirements
+      const projectRequest: ProjectGenerationRequest = {
+        description: message,
+        projectType: detectProjectType(message),
+        framework: "React/Next.js",
+        styling: "Tailwind CSS",
+        features: extractFeatures(message),
+      };
+
+      const generatedProject =
+        await openAIService.generateProject(projectRequest);
+
+      // Convert generated project to ProjectFile format
+      const projectFiles: Record<string, ProjectFile> = {};
+      Object.entries(generatedProject.files).forEach(([filename, fileData]) => {
+        projectFiles[filename] = {
+          content: fileData.content,
+          type: fileData.type,
+        };
+      });
+
+      // Notify parent component about the generated project
+      if (onProjectGenerated) {
+        onProjectGenerated(projectFiles);
+      }
+
+      return `✅ Successfully generated "${generatedProject.name}"!\n\n${generatedProject.description}\n\nGenerated ${Object.keys(projectFiles).length} files. You can now edit them in the code editor and see the live preview.`;
+    } catch (error) {
+      console.error("AI Generation Error:", error);
+      return `❌ Failed to generate project: ${error instanceof Error ? error.message : "Unknown error"}`;
+    } finally {
+      setIsAIGenerating(false);
+    }
+  };
+
+  const detectProjectType = (message: string): string => {
+    const lower = message.toLowerCase();
+    if (lower.includes("portfolio") || lower.includes("personal website"))
+      return "portfolio";
+    if (lower.includes("todo") || lower.includes("task")) return "todo-app";
+    if (lower.includes("dashboard") || lower.includes("admin"))
+      return "dashboard";
+    if (lower.includes("ecommerce") || lower.includes("shop"))
+      return "ecommerce";
+    if (lower.includes("blog")) return "blog";
+    if (lower.includes("landing") || lower.includes("saas"))
+      return "landing-page";
+    return "web-application";
+  };
+
+  const extractFeatures = (message: string): string[] => {
+    const features: string[] = [];
+    const lower = message.toLowerCase();
+
+    if (lower.includes("dark mode") || lower.includes("theme"))
+      features.push("Dark mode toggle");
+    if (lower.includes("responsive")) features.push("Responsive design");
+    if (lower.includes("animation") || lower.includes("motion"))
+      features.push("Animations");
+    if (lower.includes("form") || lower.includes("contact"))
+      features.push("Contact form");
+    if (lower.includes("chart") || lower.includes("graph"))
+      features.push("Data visualization");
+    if (lower.includes("auth") || lower.includes("login"))
+      features.push("Authentication");
+    if (lower.includes("search")) features.push("Search functionality");
+    if (lower.includes("filter")) features.push("Filtering");
+
+    return features.length > 0 ? features : ["Modern UI", "Responsive design"];
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
