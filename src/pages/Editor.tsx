@@ -249,7 +249,13 @@ export default function Editor() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => navigate && navigate("/")}
+                  onClick={() => {
+                    try {
+                      navigate("/");
+                    } catch (error) {
+                      window.location.href = "/";
+                    }
+                  }}
                   className="gap-2 text-purple-200 hover:text-white hover:expensive-gradient"
                 >
                   <Home className="h-4 w-4" />
