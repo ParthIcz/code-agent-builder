@@ -87,11 +87,11 @@ A powerful web-based IDE that uses Google's Gemini AI to generate complete proje
    npm install
    ```
 
-3. **Configure OpenAI API**
-   - Copy `.env.local` and add your OpenAI API key:
+3. **Configure Gemini API**
+   - Copy `.env.local` and add your Gemini API key:
 
    ```bash
-   VITE_OPENAI_API_KEY=sk-your-actual-api-key-here
+   VITE_GEMINI_API_KEY=your-actual-api-key-here
    ```
 
 4. **Start development server**
@@ -191,7 +191,7 @@ src/
 │   ├── CodeEditor.tsx  # Code editing interface
 │   └── LivePreview.tsx # Live preview component
 ├── pages/              # Route components
-│   ├── Index.tsx       # Landing page
+│   ��── Index.tsx       # Landing page
 │   ├── Editor.tsx      # Main editor interface
 │   └── NotFound.tsx    # 404 page
 ├── services/           # External services
