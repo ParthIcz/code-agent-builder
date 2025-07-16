@@ -220,13 +220,13 @@ export default function Editor() {
 
   // Handle initial prompt from landing page
   useEffect(() => {
-    const initialPrompt = location.state?.initialPrompt;
-    if (initialPrompt) {
+    const initialPrompt = location?.state?.initialPrompt;
+    if (initialPrompt && typeof handleChatSubmit === "function") {
       setTimeout(() => {
         handleChatSubmit(initialPrompt);
       }, 1000);
     }
-  }, [location.state, handleChatSubmit]);
+  }, [location?.state, handleChatSubmit]);
 
   return (
     <div
