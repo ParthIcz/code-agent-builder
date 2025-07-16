@@ -206,9 +206,9 @@ export default function Editor() {
     document.documentElement.classList.toggle("light", newTheme === "light");
   };
 
-  // Load project files on mount
+  // Initialize with empty project on mount
   useEffect(() => {
-    loadProjectFiles();
+    loadInitialProject();
   }, []);
 
   // Handle initial prompt from landing page
