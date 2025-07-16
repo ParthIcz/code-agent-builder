@@ -13,41 +13,135 @@ import {
   Settings,
   Sparkles,
   Zap,
+  Loader2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { ChatMessage } from "@/types";
+import {
+  geminiService,
+  type ProjectGenerationRequest,
+} from "@/services/gemini";
+import type { ChatMessage, ProjectFile } from "@/types";
 
 interface ChatAgentProps {
   messages: ChatMessage[];
   onSubmit: (message: string) => void;
   isGenerating: boolean;
+  onProjectGenerated?: (files: Record<string, ProjectFile>) => void;
 }
 
 export function ChatAgent({
   messages,
   onSubmit,
   isGenerating,
+  onProjectGenerated,
 }: ChatAgentProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isAIGenerating, setIsAIGenerating] = useState(false);
+
+  const handleAIGeneration = async (message: string) => {
+    setIsAIGenerating(true);
+
+    try {
+      // Parse the user message to extract project requirements
+      const projectRequest: ProjectGenerationRequest = {
+        description: message,
+        projectType: detectProjectType(message),
+        framework: "React/Next.js",
+        styling: "Tailwind CSS",
+        features: extractFeatures(message),
+      };
+
+      const generatedProject =
+        await geminiService.generateProject(projectRequest);
+
+      // Convert generated project to ProjectFile format
+      const projectFiles: Record<string, ProjectFile> = {};
+      Object.entries(generatedProject.files).forEach(([filename, fileData]) => {
+        projectFiles[filename] = {
+          content: fileData.content,
+          type: fileData.type,
+        };
+      });
+
+      // Notify parent component about the generated project
+      if (onProjectGenerated) {
+        onProjectGenerated(projectFiles);
+      }
+
+      return `✅ Successfully generated "${generatedProject.name}"!\n\n${generatedProject.description}\n\nGenerated ${Object.keys(projectFiles).length} files. You can now edit them in the code editor and see the live preview.`;
+    } catch (error) {
+      console.error("AI Generation Error:", error);
+      return `❌ Failed to generate project: ${error instanceof Error ? error.message : "Unknown error"}`;
+    } finally {
+      setIsAIGenerating(false);
+    }
+  };
+
+  const detectProjectType = (message: string): string => {
+    const lower = message.toLowerCase();
+    if (lower.includes("portfolio") || lower.includes("personal website"))
+      return "portfolio";
+    if (lower.includes("todo") || lower.includes("task")) return "todo-app";
+    if (lower.includes("dashboard") || lower.includes("admin"))
+      return "dashboard";
+    if (lower.includes("ecommerce") || lower.includes("shop"))
+      return "ecommerce";
+    if (lower.includes("blog")) return "blog";
+    if (lower.includes("landing") || lower.includes("saas"))
+      return "landing-page";
+    return "web-application";
+  };
+
+  const extractFeatures = (message: string): string[] => {
+    const features: string[] = [];
+    const lower = message.toLowerCase();
+
+    if (lower.includes("dark mode") || lower.includes("theme"))
+      features.push("Dark mode toggle");
+    if (lower.includes("responsive")) features.push("Responsive design");
+    if (lower.includes("animation") || lower.includes("motion"))
+      features.push("Animations");
+    if (lower.includes("form") || lower.includes("contact"))
+      features.push("Contact form");
+    if (lower.includes("chart") || lower.includes("graph"))
+      features.push("Data visualization");
+    if (lower.includes("auth") || lower.includes("login"))
+      features.push("Authentication");
+    if (lower.includes("search")) features.push("Search functionality");
+    if (lower.includes("filter")) features.push("Filtering");
+
+    return features.length > 0 ? features : ["Modern UI", "Responsive design"];
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() && !isGenerating) {
-      onSubmit(input.trim());
+    if (input.trim() && !isGenerating && !isAIGenerating) {
+      const userMessage = input.trim();
       setInput("");
+
+      // First call the original onSubmit to add user message
+      onSubmit(userMessage);
+
+      // Then handle AI generation
+      const aiResponse = await handleAIGeneration(userMessage);
+
+      // Add AI response message
+      onSubmit(aiResponse);
     }
   };
 
   const quickPrompts = [
-    "Add a hero section",
-    "Create a contact form",
-    "Make it responsive",
-    "Add dark mode toggle",
+    "Create a modern portfolio website with React and Tailwind CSS",
+    "Build a todo app with TypeScript and local storage",
+    "Generate a landing page for a SaaS product",
+    "Create a dashboard with charts and data visualization",
+    "Build an e-commerce product catalog",
+    "Generate a blog website with markdown support",
   ];
 
   const getMessageIcon = (type: ChatMessage["type"]) => {
@@ -90,13 +184,15 @@ export function ChatAgent({
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="font-semibold text-base lg:text-lg truncate">
-              AI Assistant
+              Gemini AI Assistant
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              {isGenerating ? "Generating..." : "Ready to help"}
+              {isGenerating || isAIGenerating
+                ? "Generating..."
+                : "Ready to help"}
             </p>
           </div>
-          {isGenerating && (
+          {(isGenerating || isAIGenerating) && (
             <div className="flex gap-1">
               <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
               <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
@@ -117,11 +213,11 @@ export function ChatAgent({
                     <Sparkles className="h-8 w-8 text-primary animate-pulse-glow" />
                   </div>
                   <h3 className="font-semibold mb-3 text-base sm:text-lg">
-                    Welcome to AI Code Builder
+                    Welcome to Gemini Code Builder
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-4 leading-relaxed">
-                    I'll help you build and modify your project. Try commands
-                    like:
+                    I'll help you build and modify your project using Google's
+                    Gemini AI. Try commands like:
                   </p>
                   <div className="space-y-2 text-xs sm:text-sm">
                     {quickPrompts.map((prompt, index) => (
@@ -208,7 +304,7 @@ export function ChatAgent({
             </div>
           ))}
 
-          {isGenerating && (
+          {(isGenerating || isAIGenerating) && (
             <div className="flex items-start gap-2 sm:gap-3 animate-pulse">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex-shrink-0 shadow-sm">
                 <Bot className="h-4 w-4 text-white" />
@@ -221,7 +317,11 @@ export function ChatAgent({
                       <div className="w-2 h-2 bg-primary/80 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                       <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"></div>
                     </div>
-                    <span>Thinking...</span>
+                    <span>
+                      {isAIGenerating
+                        ? "Generating with Gemini..."
+                        : "Thinking..."}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -240,12 +340,12 @@ export function ChatAgent({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Describe what you want to build..."
-                disabled={isGenerating}
+                disabled={isGenerating || isAIGenerating}
                 className="flex-1 text-sm bg-background/80 border-border/50 focus:border-primary/50 h-12 pr-14"
               />
               <Button
                 type="submit"
-                disabled={!input.trim() || isGenerating}
+                disabled={!input.trim() || isGenerating || isAIGenerating}
                 size="icon"
                 className="absolute right-1 top-1 h-10 w-10 premium-gradient"
               >
@@ -263,7 +363,7 @@ export function ChatAgent({
                 size="sm"
                 className="text-xs h-8 px-3 border-border/50 hover:border-primary/50"
                 onClick={() => setInput(prompt)}
-                disabled={isGenerating}
+                disabled={isGenerating || isAIGenerating}
               >
                 {prompt}
               </Button>
@@ -273,7 +373,7 @@ export function ChatAgent({
 
         <div className="text-xs text-purple-300 mt-3 text-center flex items-center justify-center gap-2">
           <Sparkles className="h-3 w-3" />
-          <span>Press Enter to send • Powered by Elite AI</span>
+          <span>Press Enter to send • Powered by Google Gemini</span>
           <Sparkles className="h-3 w-3" />
         </div>
       </div>

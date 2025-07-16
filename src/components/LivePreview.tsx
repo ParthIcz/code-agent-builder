@@ -30,59 +30,169 @@ export function LivePreview({ files }: LivePreviewProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [viewportSize, setViewportSize] = useState<
     "mobile" | "tablet" | "desktop"
   >("desktop");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Generate preview content
+  // Generate preview content with debouncing for smooth updates
   useEffect(() => {
-    try {
-      const htmlContent = generatePreviewHTML(files);
-      setPreviewContent(htmlContent);
-      setHasError(false);
-      setErrorMessage("");
-    } catch (error) {
-      setHasError(true);
-      setErrorMessage(
-        error instanceof Error ? error.message : "Preview generation failed",
-      );
+    // Clear existing timeout
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
     }
+
+    // Show loading state
+    setIsLoading(true);
+    setHasError(false);
+
+    // Debounce updates to avoid too frequent re-renders
+    updateTimeoutRef.current = setTimeout(() => {
+      try {
+        console.log("Updating preview with files:", Object.keys(files));
+        const htmlContent = generatePreviewHTML(files);
+        setPreviewContent(htmlContent);
+        setHasError(false);
+        setErrorMessage("");
+      } catch (error) {
+        console.error("Preview generation error:", error);
+        setHasError(true);
+        setErrorMessage(
+          error instanceof Error ? error.message : "Preview generation failed",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300); // 300ms debounce
+
+    // Cleanup function
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
   }, [files]);
 
   const generatePreviewHTML = (files: Record<string, ProjectFile>): string => {
-    // Find the main CSS file
-    const cssFile = files["app/globals.css"] || files["styles/globals.css"];
-    const cssContent = cssFile ? cssFile.content : "";
-
-    // Simple preview template
-    return `
+    // If no files are generated yet, show empty state
+    if (!files || Object.keys(files).length === 0) {
+      return `
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Preview</title>
+  <title>Gemini Code Builder - Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+  <div class="text-center max-w-md mx-auto p-8">
+    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+    </div>
+    <h1 class="text-2xl font-bold mb-2">No Project Generated</h1>
+    <p class="text-gray-400 mb-4">Use the AI chat to generate your first project!</p>
+    <div class="text-sm text-gray-500">
+      Try: "Create a portfolio website" or "Build a todo app"
+    </div>
+  </div>
+</body>
+</html>`;
+    }
+
+    // Try to find and render the actual generated content
+    return renderGeneratedContent(files);
+  };
+
+  const renderGeneratedContent = (
+    files: Record<string, ProjectFile>,
+  ): string => {
+    // Find the main HTML file (could be various paths)
+    const possibleHtmlFiles = [
+      "index.html",
+      "public/index.html",
+      "src/index.html",
+      "app/page.tsx",
+      "src/App.tsx",
+      "src/main.tsx",
+      "App.tsx",
+      "page.tsx",
+    ];
+
+    let mainHtmlFile = null;
+    let mainContent = "";
+
+    // Look for main HTML file
+    for (const path of possibleHtmlFiles) {
+      if (files[path]) {
+        mainHtmlFile = files[path];
+        mainContent = mainHtmlFile.content;
+        break;
+      }
+    }
+
+    // If we found a React component instead of HTML, we need to create HTML wrapper
+    if (
+      mainHtmlFile &&
+      (mainHtmlFile.type === "tsx" || mainHtmlFile.type === "jsx")
+    ) {
+      return generateReactPreview(files, mainContent);
+    }
+
+    // If we found an HTML file, process it
+    if (mainHtmlFile && mainHtmlFile.type === "html") {
+      return processHtmlFile(files, mainContent);
+    }
+
+    // If no main file found, try to build from available files
+    return buildFromAvailableFiles(files);
+  };
+
+  const generateReactPreview = (
+    files: Record<string, ProjectFile>,
+    mainContent: string,
+  ): string => {
+    // Find CSS files
+    const cssFiles = Object.entries(files).filter(
+      ([path, file]) => path.endsWith(".css") || file.type === "css",
+    );
+
+    let styles = "";
+    cssFiles.forEach(([path, file]) => {
+      styles += file.content + "\n";
+    });
+
+    // Extract JSX content from React component
+    const jsxMatch = mainContent.match(/return\s*\(([\s\S]*?)\);?\s*\}/);
+    let bodyContent = "";
+
+    if (jsxMatch) {
+      bodyContent = jsxMatch[1]
+        .replace(/className=/g, "class=")
+        .replace(/htmlFor=/g, "for=")
+        .replace(/{`([^`]*)`}/g, "$1")
+        .replace(/{([^}]*)}/g, (match, p1) => {
+          if (p1.startsWith('"') || p1.startsWith("'")) return p1;
+          return ""; // Remove JS expressions for static preview
+        });
+    }
+
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generated App Preview</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    ${cssContent}
+    ${styles}
     
-    /* Additional preview styles */
-    .premium-gradient {
-      background: linear-gradient(135deg, #8b5cf6, #a855f7);
-    }
-    
-    .card-gradient {
-      background: linear-gradient(135deg, #1e293b, #334155);
-    }
-    
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: hsl(225, 15%, 8%);
-      color: hsl(210, 40%, 98%);
-    }
-    
-    /* Responsive utilities */
+    /* Additional responsive utilities */
     @media (max-width: 768px) {
       .text-6xl { font-size: 3rem; }
       .text-8xl { font-size: 4rem; }
@@ -91,193 +201,13 @@ export function LivePreview({ files }: LivePreviewProps) {
   </style>
 </head>
 <body>
-  <!-- Mobile-first responsive navigation -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50">
-    <div class="container mx-auto px-4">
-      <div class="flex items-center justify-between h-14 sm:h-16">
-        <div class="text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-          AI Builder
-        </div>
-        <div class="hidden md:flex space-x-6 lg:space-x-8">
-          <a href="#home" class="text-slate-400 hover:text-white transition-colors text-sm lg:text-base">Home</a>
-          <a href="#about" class="text-slate-400 hover:text-white transition-colors text-sm lg:text-base">About</a>
-          <a href="#projects" class="text-slate-400 hover:text-white transition-colors text-sm lg:text-base">Projects</a>
-          <a href="#contact" class="text-slate-400 hover:text-white transition-colors text-sm lg:text-base">Contact</a>
-        </div>
-        <button class="md:hidden p-2 text-slate-400 hover:text-white">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Hero Section - Fully responsive -->
-  <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-14 sm:pt-16">
-    <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-slate-900 to-pink-900/20"></div>
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="text-center max-w-5xl mx-auto">
-        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
-          AI Code Builder
-        </h1>
-        <p class="text-lg sm:text-xl md:text-2xl text-slate-400 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
-          Building beautiful web applications with AI-powered code generation
-        </p>
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
-          <button class="px-6 sm:px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all text-sm sm:text-base">
-            Start Building
-          </button>
-          <button class="px-6 sm:px-8 py-3 border border-slate-600 text-white font-semibold rounded-lg hover:bg-slate-800 transition-all text-sm sm:text-base">
-            View Examples
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- About Section -->
-  <section id="about" class="py-12 sm:py-16 lg:py-20 bg-slate-800/50">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="max-w-6xl mx-auto">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 text-white">
-          Features
-        </h2>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          <div class="p-6 bg-slate-700/50 rounded-xl hover:bg-slate-700/70 transition-all">
-            <div class="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">AI-Powered</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Generate complete web applications with just a simple description
-            </p>
-          </div>
-          
-          <div class="p-6 bg-slate-700/50 rounded-xl hover:bg-slate-700/70 transition-all">
-            <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Live Editor</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Edit code with syntax highlighting and real-time preview
-            </p>
-          </div>
-          
-          <div class="p-6 bg-slate-700/50 rounded-xl hover:bg-slate-700/70 transition-all sm:col-span-2 lg:col-span-1">
-            <div class="w-12 h-12 bg-green-600/20 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Responsive</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              All generated code is mobile-first and fully responsive
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Projects Section -->
-  <section id="projects" class="py-12 sm:py-16 lg:py-20">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="max-w-6xl mx-auto">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 text-white">
-          What You Can Build
-        </h2>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          <div class="bg-slate-800/50 rounded-xl p-6 hover:bg-slate-700/50 transition-all group">
-            <div class="w-full h-32 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-lg mb-4 flex items-center justify-center">
-              <span class="text-2xl">🚀</span>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Landing Pages</h3>
-            <p class="text-slate-400 text-sm mb-4 leading-relaxed">
-              Modern landing pages with hero sections, features, and contact forms
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs">React</span>
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs">Tailwind</span>
-            </div>
-          </div>
-          
-          <div class="bg-slate-800/50 rounded-xl p-6 hover:bg-slate-700/50 transition-all group">
-            <div class="w-full h-32 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-lg mb-4 flex items-center justify-center">
-              <span class="text-2xl">📊</span>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Dashboards</h3>
-            <p class="text-slate-400 text-sm mb-4 leading-relaxed">
-              Analytics dashboards with charts, tables, and interactive components
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs">Charts</span>
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs">Data</span>
-            </div>
-          </div>
-          
-          <div class="bg-slate-800/50 rounded-xl p-6 hover:bg-slate-700/50 transition-all group sm:col-span-2 lg:col-span-1">
-            <div class="w-full h-32 bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-lg mb-4 flex items-center justify-center">
-              <span class="text-2xl">🛍️</span>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">E-commerce</h3>
-            <p class="text-slate-400 text-sm mb-4 leading-relaxed">
-              Online stores with product catalogs, shopping carts, and checkout
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs">Commerce</span>
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs">Payments</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact" class="py-12 sm:py-16 lg:py-20 bg-slate-800/50">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 text-white">
-          Get Started Today
-        </h2>
-        <div class="text-center">
-          <p class="text-lg sm:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of developers who are building faster with AI-powered code generation.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all text-base">
-              Start Building Now
-            </button>
-            <button class="px-8 py-4 border border-slate-600 text-white font-semibold rounded-lg hover:bg-slate-800 transition-all text-base">
-              Learn More
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="py-8 border-t border-slate-800">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center">
-        <p class="text-slate-500 text-sm">
-          © 2024 AI Code Builder. Built with ❤️ and AI.
-        </p>
-      </div>
-    </div>
-  </footer>
+  ${bodyContent || generateFallbackContent(files)}
   
   <script>
-    // Add basic interactivity
+    // Basic interactivity for generated content
     document.addEventListener('DOMContentLoaded', function() {
-      // Handle navigation
-      const navLinks = document.querySelectorAll('nav a[href^="#"]');
+      // Handle navigation links
+      const navLinks = document.querySelectorAll('a[href^="#"]');
       navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
           e.preventDefault();
@@ -288,34 +218,153 @@ export function LivePreview({ files }: LivePreviewProps) {
         });
       });
       
+      // Handle form submissions
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          alert('Form submitted! (This is a preview)');
+        });
+      });
+      
       // Handle button clicks
-      const buttons = document.querySelectorAll('button');
+      const buttons = document.querySelectorAll('button:not([type="submit"])');
       buttons.forEach(button => {
-        if (!button.querySelector('svg')) { // Skip icon buttons
-          button.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (this.textContent.includes('Start Building')) {
-              alert('Ready to start building! This is a live preview.');
-            } else {
-              alert('Button clicked! This is a live preview.');
-            }
+        if (!button.querySelector('svg') && !button.onclick) {
+          button.addEventListener('click', function() {
+            console.log('Button clicked:', this.textContent);
           });
         }
       });
     });
   </script>
 </body>
-</html>
-    `;
+</html>`;
+  };
+
+  const processHtmlFile = (
+    files: Record<string, ProjectFile>,
+    htmlContent: string,
+  ): string => {
+    // Find and inject CSS files
+    const cssFiles = Object.entries(files).filter(
+      ([path, file]) => path.endsWith(".css") || file.type === "css",
+    );
+
+    let styles = "";
+    cssFiles.forEach(([path, file]) => {
+      styles += file.content + "\n";
+    });
+
+    // Inject Tailwind and custom styles
+    const styledHtml = htmlContent.replace(
+      "</head>",
+      `  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ${styles}
+  </style>
+</head>`,
+    );
+
+    return styledHtml;
+  };
+
+  const buildFromAvailableFiles = (
+    files: Record<string, ProjectFile>,
+  ): string => {
+    const fileList = Object.keys(files);
+
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generated Project Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        Generated Project
+      </h1>
+      <p class="text-gray-400">Your AI-generated project is ready! Generated ${fileList.length} files.</p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      ${fileList
+        .map(
+          (filename) => `
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span class="text-sm font-mono text-gray-300">${filename}</span>
+          </div>
+          <div class="text-xs text-gray-500">${files[filename].type || "file"}</div>
+        </div>
+      `,
+        )
+        .join("")}
+    </div>
+    
+    <div class="text-center">
+      <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg px-4 py-2">
+        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-blue-400 text-sm">Use the code editor to view and modify your files</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+  };
+
+  const generateFallbackContent = (
+    files: Record<string, ProjectFile>,
+  ): string => {
+    return `
+  <div class="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-4">
+    <div class="text-center max-w-2xl">
+      <h1 class="text-5xl font-bold mb-6 text-white">Your Generated App</h1>
+      <p class="text-xl text-purple-200 mb-8">
+        Successfully generated ${Object.keys(files).length} files with AI
+      </p>
+      <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <p class="text-white/80">
+          This is a preview of your AI-generated application. 
+          Edit the files in the code editor to see changes in real-time!
+        </p>
+      </div>
+    </div>
+  </div>`;
   };
 
   const handleRefresh = () => {
-    // Force re-render
+    // Show loading state
+    setIsLoading(true);
+    setHasError(false);
     setPreviewContent("");
+
+    // Force re-render with delay
     setTimeout(() => {
-      const htmlContent = generatePreviewHTML(files);
-      setPreviewContent(htmlContent);
-    }, 100);
+      try {
+        console.log("Manual refresh triggered");
+        const htmlContent = generatePreviewHTML(files);
+        setPreviewContent(htmlContent);
+        setHasError(false);
+        setErrorMessage("");
+      } catch (error) {
+        console.error("Manual refresh error:", error);
+        setHasError(true);
+        setErrorMessage(
+          error instanceof Error ? error.message : "Preview generation failed",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300);
   };
 
   const handleOpenInNewTab = () => {
@@ -355,7 +404,16 @@ export function LivePreview({ files }: LivePreviewProps) {
             <h2 className="font-semibold text-base sm:text-lg truncate">
               Live Preview
             </h2>
-            {hasError && (
+            {isLoading && (
+              <Badge
+                variant="secondary"
+                className="flex items-center gap-1 text-xs animate-pulse"
+              >
+                <RefreshCw className="h-3 w-3 animate-spin" />
+                Updating
+              </Badge>
+            )}
+            {hasError && !isLoading && (
               <Badge
                 variant="destructive"
                 className="flex items-center gap-1 text-xs"
@@ -459,7 +517,17 @@ export function LivePreview({ files }: LivePreviewProps) {
             </Card>
           </div>
         ) : isVisible ? (
-          <div className="h-full flex justify-center">
+          <div className="h-full flex justify-center relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-card/80 backdrop-blur-sm flex items-center justify-center z-10">
+                <div className="flex items-center gap-3 bg-card border border-border rounded-lg px-4 py-3 shadow-lg">
+                  <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-sm font-medium">
+                    Updating preview...
+                  </span>
+                </div>
+              </div>
+            )}
             <div
               style={getViewportStyles()}
               className="transition-all duration-300 ease-in-out border-l border-r border-border/50"

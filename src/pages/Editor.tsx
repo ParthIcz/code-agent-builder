@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { ChatAgent } from "@/components/ChatAgent";
 import { CodeEditor } from "@/components/CodeEditor";
@@ -11,6 +11,11 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 import {
   Download,
   Play,
@@ -28,8 +33,12 @@ import type { ProjectFile, ChatMessage } from "@/types";
 import { useNavigate } from "react-router-dom";
 
 export default function Editor() {
+  // Always call hooks at the top level
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Counter to ensure unique message IDs
+  const messageIdRef = useRef(0);
   const [files, setFiles] = useState<Record<string, ProjectFile>>({});
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -40,35 +49,56 @@ export default function Editor() {
   );
   const [chatOpen, setChatOpen] = useState(false);
 
-  const loadProjectFiles = async () => {
+  // Panel size persistence
+  const [panelSizes, setPanelSizes] = useState(() => {
     try {
-      const response = await fetch("/project.json");
-      const data = await response.json();
-      setFiles(data.files);
-
-      // Select first file by default
-      const firstFile = Object.keys(data.files)[0];
-      if (firstFile) {
-        setSelectedFile(firstFile);
-      }
-
-      // Add system message
-      setChatMessages([
-        {
-          id: "1",
-          type: "system",
-          content: `✅ Loaded project: ${data.name}`,
-          timestamp: new Date(),
-        },
-      ]);
-    } catch (error) {
-      console.error("Failed to load project files:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load project files",
-        variant: "destructive",
-      });
+      const saved = localStorage.getItem("editor-panel-sizes");
+      return saved ? JSON.parse(saved) : [25, 45, 30];
+    } catch {
+      return [25, 45, 30];
     }
+  });
+
+  const handlePanelResize = (sizes: number[]) => {
+    setPanelSizes(sizes);
+    try {
+      localStorage.setItem("editor-panel-sizes", JSON.stringify(sizes));
+    } catch {
+      // Silently fail if localStorage is not available
+    }
+  };
+
+  const handleProjectGenerated = (
+    generatedFiles: Record<string, ProjectFile>,
+  ) => {
+    setFiles(generatedFiles);
+
+    // Select first file by default
+    const firstFile = Object.keys(generatedFiles)[0];
+    if (firstFile) {
+      setSelectedFile(firstFile);
+    }
+
+    toast({
+      title: "Project Generated",
+      description: `Successfully generated ${Object.keys(generatedFiles).length} files`,
+    });
+  };
+
+  const loadInitialProject = () => {
+    // Set empty initial state - projects will be generated via AI
+    setFiles({});
+    setSelectedFile("");
+
+    // Add welcome message
+    setChatMessages([
+      {
+        id: "welcome-1",
+        type: "system",
+        content: `🤖 Welcome to Gemini Code Builder! Describe what you want to build and I'll generate the complete project for you using Google's Gemini AI.`,
+        timestamp: new Date(),
+      },
+    ]);
   };
 
   const handleFileUpdate = (filename: string, content: string) => {
@@ -84,7 +114,7 @@ export default function Editor() {
     setChatMessages((prev) => [
       ...prev,
       {
-        id: Date.now().toString(),
+        id: `msg-${++messageIdRef.current}-${Date.now()}`,
         type: "system",
         content: `🛠 Updated \`${filename}\``,
         timestamp: new Date(),
@@ -92,67 +122,21 @@ export default function Editor() {
     ]);
   };
 
-  const handleChatSubmit = useCallback(
-    async (message: string) => {
-      setIsGenerating(true);
-
-      // Add user message
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          type: "user",
-          content: message,
-          timestamp: new Date(),
-        },
-      ]);
-
-      try {
-        // Simulate AI response
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Add AI response
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            type: "assistant",
-            content: `I'll help you with that! Let me update the files accordingly.`,
-            timestamp: new Date(),
-          },
-        ]);
-
-        // Simulate file updates
-        setTimeout(() => {
-          const filesToUpdate = Object.keys(files).slice(0, 2);
-          filesToUpdate.forEach((filename) => {
-            setChatMessages((prev) => [
-              ...prev,
-              {
-                id: Date.now().toString(),
-                type: "system",
-                content: `✅ Updated \`${filename}\``,
-                timestamp: new Date(),
-              },
-            ]);
-          });
-        }, 1000);
-      } catch (error) {
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            type: "error",
-            content: `⚠️ Error: Failed to process request`,
-            timestamp: new Date(),
-          },
-        ]);
-      } finally {
-        setIsGenerating(false);
-      }
-    },
-    [files],
-  );
+  const handleChatSubmit = useCallback((message: string) => {
+    // Add message to chat history
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: `msg-${++messageIdRef.current}-${Date.now()}`,
+        type:
+          message.startsWith("✅") || message.startsWith("❌")
+            ? "assistant"
+            : "user",
+        content: message,
+        timestamp: new Date(),
+      },
+    ]);
+  }, []);
 
   const handleDownload = async () => {
     try {
@@ -176,20 +160,20 @@ export default function Editor() {
     document.documentElement.classList.toggle("light", newTheme === "light");
   };
 
-  // Load project files on mount
+  // Initialize with empty project on mount
   useEffect(() => {
-    loadProjectFiles();
+    loadInitialProject();
   }, []);
 
   // Handle initial prompt from landing page
   useEffect(() => {
-    const initialPrompt = location.state?.initialPrompt;
-    if (initialPrompt) {
+    const initialPrompt = location?.state?.initialPrompt;
+    if (initialPrompt && typeof handleChatSubmit === "function") {
       setTimeout(() => {
         handleChatSubmit(initialPrompt);
       }, 1000);
     }
-  }, [location.state, handleChatSubmit]);
+  }, [location?.state, handleChatSubmit]);
 
   return (
     <div
@@ -205,7 +189,13 @@ export default function Editor() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  try {
+                    navigate("/");
+                  } catch (error) {
+                    window.location.href = "/";
+                  }
+                }}
                 className="lg:hidden"
               >
                 <Home className="h-4 w-4" />
@@ -215,7 +205,13 @@ export default function Editor() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => navigate("/")}
+                  onClick={() => {
+                    try {
+                      navigate("/");
+                    } catch (error) {
+                      window.location.href = "/";
+                    }
+                  }}
                   className="gap-2 text-purple-200 hover:text-white hover:expensive-gradient"
                 >
                   <Home className="h-4 w-4" />
@@ -225,10 +221,10 @@ export default function Editor() {
               </div>
 
               <h1 className="text-xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
-                AI Code Builder
+                Gemini Code Builder
               </h1>
               <div className="hidden sm:block text-sm text-muted-foreground">
-                Build with AI • Edit • Preview
+                Build with Gemini AI • Edit • Preview
               </div>
             </div>
 
@@ -291,6 +287,7 @@ export default function Editor() {
                     messages={chatMessages}
                     onSubmit={handleChatSubmit}
                     isGenerating={isGenerating}
+                    onProjectGenerated={handleProjectGenerated}
                   />
                 </SheetContent>
               </Sheet>
@@ -300,23 +297,72 @@ export default function Editor() {
       </header>
 
       {/* Main Layout */}
-      <div className="flex h-[calc(100vh-73px)] relative z-10">
-        {/* Desktop: Left Panel - Chat Agent */}
-        <div className="hidden lg:block w-80 xl:w-96 border-r border-border bg-card/30">
-          <ChatAgent
-            messages={chatMessages}
-            onSubmit={handleChatSubmit}
-            isGenerating={isGenerating}
-          />
+      <div className="h-[calc(100vh-73px)] relative z-10">
+        {/* Desktop: Resizable Panels */}
+        <div className="hidden lg:block h-full">
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="h-full"
+            onLayout={handlePanelResize}
+          >
+            {/* Chat Agent Panel */}
+            <ResizablePanel
+              defaultSize={panelSizes[0]}
+              minSize={20}
+              maxSize={40}
+              className="bg-card/30"
+            >
+              <ChatAgent
+                messages={chatMessages}
+                onSubmit={handleChatSubmit}
+                isGenerating={isGenerating}
+                onProjectGenerated={handleProjectGenerated}
+              />
+            </ResizablePanel>
+
+            <ResizableHandle
+              withHandle
+              className="w-2 bg-border/50 hover:bg-primary/20 transition-colors duration-200"
+            />
+
+            {/* Code Editor Panel */}
+            <ResizablePanel
+              defaultSize={panelSizes[1]}
+              minSize={30}
+              maxSize={60}
+            >
+              <CodeEditor
+                files={files}
+                selectedFile={selectedFile}
+                onFileSelect={setSelectedFile}
+                onFileUpdate={handleFileUpdate}
+              />
+            </ResizablePanel>
+
+            <ResizableHandle
+              withHandle
+              className="w-2 bg-border/50 hover:bg-primary/20 transition-colors duration-200"
+            />
+
+            {/* Live Preview Panel */}
+            <ResizablePanel
+              defaultSize={panelSizes[2]}
+              minSize={20}
+              maxSize={50}
+            >
+              <LivePreview files={files} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
 
         {/* Mobile: Single Panel View */}
-        <div className="flex-1 lg:hidden">
+        <div className="flex-1 lg:hidden h-full">
           {activePanel === "chat" && (
             <ChatAgent
               messages={chatMessages}
               onSubmit={handleChatSubmit}
               isGenerating={isGenerating}
+              onProjectGenerated={handleProjectGenerated}
             />
           )}
           {activePanel === "code" && (
@@ -328,21 +374,6 @@ export default function Editor() {
             />
           )}
           {activePanel === "preview" && <LivePreview files={files} />}
-        </div>
-
-        {/* Desktop: Center Panel - Code Editor */}
-        <div className="hidden lg:block flex-1 border-r border-border">
-          <CodeEditor
-            files={files}
-            selectedFile={selectedFile}
-            onFileSelect={setSelectedFile}
-            onFileUpdate={handleFileUpdate}
-          />
-        </div>
-
-        {/* Desktop: Right Panel - Live Preview */}
-        <div className="hidden lg:block w-80 xl:w-96">
-          <LivePreview files={files} />
         </div>
       </div>
 
