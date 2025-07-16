@@ -26,6 +26,7 @@ interface ChatAgentProps {
   messages: ChatMessage[];
   onSubmit: (message: string) => void;
   isGenerating: boolean;
+  onProjectGenerated?: (files: Record<string, ProjectFile>) => void;
 }
 
 export function ChatAgent({
