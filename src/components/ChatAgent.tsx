@@ -13,9 +13,14 @@ import {
   Settings,
   Sparkles,
   Zap,
+  Loader2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { ChatMessage } from "@/types";
+import {
+  openAIService,
+  type ProjectGenerationRequest,
+} from "@/services/openai";
+import type { ChatMessage, ProjectFile } from "@/types";
 
 interface ChatAgentProps {
   messages: ChatMessage[];
