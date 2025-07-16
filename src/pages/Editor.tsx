@@ -122,67 +122,21 @@ export default function Editor() {
     ]);
   };
 
-  const handleChatSubmit = useCallback(
-    async (message: string) => {
-      setIsGenerating(true);
-
-      // Add user message
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: `msg-${++messageIdRef.current}-${Date.now()}`,
-          type: "user",
-          content: message,
-          timestamp: new Date(),
-        },
-      ]);
-
-      try {
-        // Simulate AI response
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Add AI response
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            id: `msg-${++messageIdRef.current}-${Date.now()}`,
-            type: "assistant",
-            content: `I'll help you with that! Let me update the files accordingly.`,
-            timestamp: new Date(),
-          },
-        ]);
-
-        // Simulate file updates
-        setTimeout(() => {
-          const filesToUpdate = Object.keys(files).slice(0, 2);
-          filesToUpdate.forEach((filename) => {
-            setChatMessages((prev) => [
-              ...prev,
-              {
-                id: `msg-${++messageIdRef.current}-${Date.now()}`,
-                type: "system",
-                content: `✅ Updated \`${filename}\``,
-                timestamp: new Date(),
-              },
-            ]);
-          });
-        }, 1000);
-      } catch (error) {
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            id: `msg-${++messageIdRef.current}-${Date.now()}`,
-            type: "error",
-            content: `⚠️ Error: Failed to process request`,
-            timestamp: new Date(),
-          },
-        ]);
-      } finally {
-        setIsGenerating(false);
-      }
-    },
-    [files],
-  );
+  const handleChatSubmit = useCallback((message: string) => {
+    // Add message to chat history
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: `msg-${++messageIdRef.current}-${Date.now()}`,
+        type:
+          message.startsWith("✅") || message.startsWith("❌")
+            ? "assistant"
+            : "user",
+        content: message,
+        timestamp: new Date(),
+      },
+    ]);
+  }, []);
 
   const handleDownload = async () => {
     try {
