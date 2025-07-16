@@ -338,7 +338,7 @@ export function ChatAgent({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Describe what you want to build..."
-                disabled={isGenerating}
+                disabled={isGenerating || isAIGenerating}
                 className="flex-1 text-sm bg-background/80 border-border/50 focus:border-primary/50 h-12 pr-14"
               />
               <Button
