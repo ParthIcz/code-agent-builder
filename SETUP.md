@@ -61,7 +61,7 @@ npm run dev
 
 - **Frontend**: React + TypeScript + Vite
 - **Styling**: Tailwind CSS + shadcn/ui
-- **AI**: OpenAI GPT-4 API
+- **AI**: Google Gemini API
 - **Code Editor**: CodeMirror 6
 - **Icons**: Lucide React
 - **Build Tool**: Vite
