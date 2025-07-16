@@ -166,12 +166,12 @@ Start a conversation with the AI by describing what you want to build:
 
 ```bash
 # Required
-VITE_OPENAI_API_KEY=sk-your-openai-api-key
+VITE_GEMINI_API_KEY=your-gemini-api-key
 
-# Optional customization
-VITE_MODEL_NAME=gpt-4  # or gpt-3.5-turbo
-VITE_MAX_TOKENS=4000
-VITE_TEMPERATURE=0.7
+# The Gemini API is free tier with generous limits:
+# - 15 requests per minute
+# - 1500 requests per day
+# - No credit card required for basic usage
 ```
 
 ### Customization Options
@@ -191,7 +191,7 @@ src/
 │   ├── CodeEditor.tsx  # Code editing interface
 │   └── LivePreview.tsx # Live preview component
 ├── pages/              # Route components
-│   ��── Index.tsx       # Landing page
+│   ├── Index.tsx       # Landing page
 │   ├── Editor.tsx      # Main editor interface
 │   └── NotFound.tsx    # 404 page
 ├── services/           # External services
