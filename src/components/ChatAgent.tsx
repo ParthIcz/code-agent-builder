@@ -361,7 +361,7 @@ export function ChatAgent({
                 size="sm"
                 className="text-xs h-8 px-3 border-border/50 hover:border-primary/50"
                 onClick={() => setInput(prompt)}
-                disabled={isGenerating}
+                disabled={isGenerating || isAIGenerating}
               >
                 {prompt}
               </Button>
