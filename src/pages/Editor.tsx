@@ -305,18 +305,47 @@ export default function Editor() {
       </header>
 
       {/* Main Layout */}
-      <div className="flex h-[calc(100vh-73px)] relative z-10">
-        {/* Desktop: Left Panel - Chat Agent */}
-        <div className="hidden lg:block w-80 xl:w-96 border-r border-border bg-card/30">
-          <ChatAgent
-            messages={chatMessages}
-            onSubmit={handleChatSubmit}
-            isGenerating={isGenerating}
-          />
+      <div className="h-[calc(100vh-73px)] relative z-10">
+        {/* Desktop: Resizable Panels */}
+        <div className="hidden lg:block h-full">
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            {/* Chat Agent Panel */}
+            <ResizablePanel
+              defaultSize={25}
+              minSize={20}
+              maxSize={40}
+              className="bg-card/30"
+            >
+              <ChatAgent
+                messages={chatMessages}
+                onSubmit={handleChatSubmit}
+                isGenerating={isGenerating}
+              />
+            </ResizablePanel>
+
+            <ResizableHandle className="w-1 bg-border hover:bg-border/80 transition-colors" />
+
+            {/* Code Editor Panel */}
+            <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
+              <CodeEditor
+                files={files}
+                selectedFile={selectedFile}
+                onFileSelect={setSelectedFile}
+                onFileUpdate={handleFileUpdate}
+              />
+            </ResizablePanel>
+
+            <ResizableHandle className="w-1 bg-border hover:bg-border/80 transition-colors" />
+
+            {/* Live Preview Panel */}
+            <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
+              <LivePreview files={files} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
 
         {/* Mobile: Single Panel View */}
-        <div className="flex-1 lg:hidden">
+        <div className="flex-1 lg:hidden h-full">
           {activePanel === "chat" && (
             <ChatAgent
               messages={chatMessages}
@@ -333,21 +362,6 @@ export default function Editor() {
             />
           )}
           {activePanel === "preview" && <LivePreview files={files} />}
-        </div>
-
-        {/* Desktop: Center Panel - Code Editor */}
-        <div className="hidden lg:block flex-1 border-r border-border">
-          <CodeEditor
-            files={files}
-            selectedFile={selectedFile}
-            onFileSelect={setSelectedFile}
-            onFileUpdate={handleFileUpdate}
-          />
-        </div>
-
-        {/* Desktop: Right Panel - Live Preview */}
-        <div className="hidden lg:block w-80 xl:w-96">
-          <LivePreview files={files} />
         </div>
       </div>
 
