@@ -53,8 +53,8 @@ A powerful web-based IDE that uses Google's Gemini AI to generate complete proje
 
 ### AI Integration
 
-- **OpenAI GPT-4** for code generation
-- **Axios** for API communication
+- **Google Gemini AI** for code generation
+- **Native Fetch** for API communication
 - **Smart prompting** for optimal results
 - **Error recovery** and retries
 
@@ -190,7 +190,7 @@ src/
 │   ├── ChatAgent.tsx   # AI chat interface
 │   ├── CodeEditor.tsx  # Code editing interface
 │   └── LivePreview.tsx # Live preview component
-├── pages/              # Route components
+��── pages/              # Route components
 │   ├── Index.tsx       # Landing page
 │   ├── Editor.tsx      # Main editor interface
 │   └── NotFound.tsx    # 404 page
