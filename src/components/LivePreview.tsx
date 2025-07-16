@@ -30,10 +30,12 @@ export function LivePreview({ files }: LivePreviewProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [viewportSize, setViewportSize] = useState<
     "mobile" | "tablet" | "desktop"
   >("desktop");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Generate preview content
   useEffect(() => {
