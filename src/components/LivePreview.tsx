@@ -37,19 +37,42 @@ export function LivePreview({ files }: LivePreviewProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Generate preview content
+  // Generate preview content with debouncing for smooth updates
   useEffect(() => {
-    try {
-      const htmlContent = generatePreviewHTML(files);
-      setPreviewContent(htmlContent);
-      setHasError(false);
-      setErrorMessage("");
-    } catch (error) {
-      setHasError(true);
-      setErrorMessage(
-        error instanceof Error ? error.message : "Preview generation failed",
-      );
+    // Clear existing timeout
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
     }
+
+    // Show loading state
+    setIsLoading(true);
+    setHasError(false);
+
+    // Debounce updates to avoid too frequent re-renders
+    updateTimeoutRef.current = setTimeout(() => {
+      try {
+        console.log("Updating preview with files:", Object.keys(files));
+        const htmlContent = generatePreviewHTML(files);
+        setPreviewContent(htmlContent);
+        setHasError(false);
+        setErrorMessage("");
+      } catch (error) {
+        console.error("Preview generation error:", error);
+        setHasError(true);
+        setErrorMessage(
+          error instanceof Error ? error.message : "Preview generation failed",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300); // 300ms debounce
+
+    // Cleanup function
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
   }, [files]);
 
   const generatePreviewHTML = (files: Record<string, ProjectFile>): string => {
