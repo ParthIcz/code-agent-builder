@@ -33,6 +33,7 @@ export function ChatAgent({
   messages,
   onSubmit,
   isGenerating,
+  onProjectGenerated,
 }: ChatAgentProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
