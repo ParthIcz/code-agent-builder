@@ -192,7 +192,7 @@ export function ChatAgent({
                 : "Ready to help"}
             </p>
           </div>
-          {isGenerating && (
+          {(isGenerating || isAIGenerating) && (
             <div className="flex gap-1">
               <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
               <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
@@ -304,7 +304,7 @@ export function ChatAgent({
             </div>
           ))}
 
-          {isGenerating && (
+          {(isGenerating || isAIGenerating) && (
             <div className="flex items-start gap-2 sm:gap-3 animate-pulse">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex-shrink-0 shadow-sm">
                 <Bot className="h-4 w-4 text-white" />
@@ -317,7 +317,9 @@ export function ChatAgent({
                       <div className="w-2 h-2 bg-primary/80 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                       <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"></div>
                     </div>
-                    <span>Thinking...</span>
+                    <span>
+                      {isAIGenerating ? "Generating project..." : "Thinking..."}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
