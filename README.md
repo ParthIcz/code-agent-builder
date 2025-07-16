@@ -220,7 +220,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [OpenAI](https://openai.com) for the powerful GPT-4 API
+- [Google AI](https://ai.google.dev) for the powerful Gemini API
 - [shadcn/ui](https://ui.shadcn.com) for beautiful UI components
 - [CodeMirror](https://codemirror.net) for the excellent code editor
 - [Tailwind CSS](https://tailwindcss.com) for utility-first styling
