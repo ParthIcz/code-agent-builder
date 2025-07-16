@@ -387,7 +387,16 @@ export function LivePreview({ files }: LivePreviewProps) {
             <h2 className="font-semibold text-base sm:text-lg truncate">
               Live Preview
             </h2>
-            {hasError && (
+            {isLoading && (
+              <Badge
+                variant="secondary"
+                className="flex items-center gap-1 text-xs animate-pulse"
+              >
+                <RefreshCw className="h-3 w-3 animate-spin" />
+                Updating
+              </Badge>
+            )}
+            {hasError && !isLoading && (
               <Badge
                 variant="destructive"
                 className="flex items-center gap-1 text-xs"
