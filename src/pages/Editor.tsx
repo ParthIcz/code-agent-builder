@@ -68,35 +68,37 @@ export default function Editor() {
     }
   };
 
-  const loadProjectFiles = async () => {
-    try {
-      const response = await fetch("/project.json");
-      const data = await response.json();
-      setFiles(data.files);
+  const handleProjectGenerated = (
+    generatedFiles: Record<string, ProjectFile>,
+  ) => {
+    setFiles(generatedFiles);
 
-      // Select first file by default
-      const firstFile = Object.keys(data.files)[0];
-      if (firstFile) {
-        setSelectedFile(firstFile);
-      }
-
-      // Add system message
-      setChatMessages([
-        {
-          id: "1",
-          type: "system",
-          content: `✅ Loaded project: ${data.name}`,
-          timestamp: new Date(),
-        },
-      ]);
-    } catch (error) {
-      console.error("Failed to load project files:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load project files",
-        variant: "destructive",
-      });
+    // Select first file by default
+    const firstFile = Object.keys(generatedFiles)[0];
+    if (firstFile) {
+      setSelectedFile(firstFile);
     }
+
+    toast({
+      title: "Project Generated",
+      description: `Successfully generated ${Object.keys(generatedFiles).length} files`,
+    });
+  };
+
+  const loadInitialProject = () => {
+    // Set empty initial state - projects will be generated via AI
+    setFiles({});
+    setSelectedFile("");
+
+    // Add welcome message
+    setChatMessages([
+      {
+        id: "welcome-1",
+        type: "system",
+        content: `🤖 Welcome to AI Code Builder! Describe what you want to build and I'll generate the complete project for you.`,
+        timestamp: new Date(),
+      },
+    ]);
   };
 
   const handleFileUpdate = (filename: string, content: string) => {
