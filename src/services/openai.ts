@@ -31,7 +31,7 @@ class OpenAIService {
   private apiKey: string;
 
   constructor() {
-    this.apiKey = "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
+    this.apiKey =  "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
 ";
 
     if (!this.apiKey) {
