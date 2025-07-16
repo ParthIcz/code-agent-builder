@@ -84,27 +84,32 @@ export function LivePreview({ files }: LivePreviewProps) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gemini Code Builder - Preview</title>
+  <title>Live Preview - No Content</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen flex items-center justify-center">
   <div class="text-center max-w-md mx-auto p-8">
-    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-pulse">
       <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
       </svg>
     </div>
-    <h1 class="text-2xl font-bold mb-2">No Project Generated</h1>
-    <p class="text-gray-400 mb-4">Use the AI chat to generate your first project!</p>
-    <div class="text-sm text-gray-500">
-      Try: "Create a portfolio website" or "Build a todo app"
+    <h1 class="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Ready for Live Preview</h1>
+    <p class="text-gray-400 mb-6 leading-relaxed">Generate your first project with AI and watch it come to life here in real-time!</p>
+    <div class="text-sm text-gray-500 bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+      <div class="font-medium mb-2">Try these prompts:</div>
+      <div class="space-y-1">
+        <div>• "Create a portfolio website"</div>
+        <div>• "Build a todo app"</div>
+        <div>• "Make a landing page"</div>
+      </div>
     </div>
   </div>
 </body>
 </html>`;
     }
 
-    // Try to find and render the actual generated content
+    // Try to find and render the actual generated content with enhanced logic
     return renderGeneratedContent(files);
   };
 
@@ -161,12 +166,22 @@ export function LivePreview({ files }: LivePreviewProps) {
       ([path, file]) => path.endsWith(".css") || file.type === "css",
     );
 
+    // Find JS files for additional scripts
+    const jsFiles = Object.entries(files).filter(
+      ([path, file]) => path.endsWith(".js") || file.type === "js",
+    );
+
     let styles = "";
     cssFiles.forEach(([path, file]) => {
       styles += file.content + "\n";
     });
 
-    // Extract JSX content from React component
+    let scripts = "";
+    jsFiles.forEach(([path, file]) => {
+      scripts += file.content + "\n";
+    });
+
+    // Extract JSX content from React component with better parsing
     const jsxMatch = mainContent.match(/return\s*\(([\s\S]*?)\);?\s*\}/);
     let bodyContent = "";
 
@@ -174,11 +189,25 @@ export function LivePreview({ files }: LivePreviewProps) {
       bodyContent = jsxMatch[1]
         .replace(/className=/g, "class=")
         .replace(/htmlFor=/g, "for=")
-        .replace(/{`([^`]*)`}/g, "$1")
-        .replace(/{([^}]*)}/g, (match, p1) => {
-          if (p1.startsWith('"') || p1.startsWith("'")) return p1;
-          return ""; // Remove JS expressions for static preview
-        });
+        .replace(/{`([^`]*)`}/g, "$1") // Template literals
+        .replace(/{\s*"([^"]*)"\s*}/g, "$1") // String expressions
+        .replace(/{\s*'([^']*)'\s*}/g, "$1") // String expressions with single quotes
+        .replace(/{\s*(\d+)\s*}/g, "$1") // Number expressions
+        .replace(/{[^}]*}/g, ""); // Remove remaining JS expressions
+    }
+
+    // If no JSX found, try to find other renderable content
+    if (!bodyContent) {
+      // Look for JSX-like content in the file
+      const componentMatch = mainContent.match(/<[^>]+>[\s\S]*<\/[^>]+>/);
+      if (componentMatch) {
+        bodyContent = componentMatch[0]
+          .replace(/className=/g, "class=")
+          .replace(/htmlFor=/g, "for=");
+      } else {
+        // Fallback to a smart preview
+        bodyContent = generateFallbackContent(files);
+      }
     }
 
     return `
@@ -187,16 +216,43 @@ export function LivePreview({ files }: LivePreviewProps) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generated App Preview</title>
+  <title>Live Preview</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     ${styles}
     
-    /* Additional responsive utilities */
+    /* Enhanced responsive utilities and modern design */
+    body { 
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      line-height: 1.6;
+    }
+    
     @media (max-width: 768px) {
-      .text-6xl { font-size: 3rem; }
-      .text-8xl { font-size: 4rem; }
-      .py-20 { padding-top: 3rem; padding-bottom: 3rem; }
+      .text-6xl { font-size: 3rem !important; }
+      .text-8xl { font-size: 4rem !important; }
+      .py-20 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+      .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+    }
+    
+    /* Smooth interactions */
+    button, a, input, textarea {
+      transition: all 0.2s ease-in-out;
+    }
+    
+    button:hover, a:hover {
+      transform: translateY(-1px);
+    }
+    
+    /* Enhanced form styling */
+    input, textarea, select {
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      ring: 2px;
+      ring-color: #3b82f6;
+      border-color: #3b82f6;
     }
   </style>
 </head>
@@ -204,37 +260,112 @@ export function LivePreview({ files }: LivePreviewProps) {
   ${bodyContent || generateFallbackContent(files)}
   
   <script>
-    // Basic interactivity for generated content
+    ${scripts}
+    
+    // Enhanced interactivity for React components preview
     document.addEventListener('DOMContentLoaded', function() {
-      // Handle navigation links
+      // Handle navigation links with smooth scrolling
       const navLinks = document.querySelectorAll('a[href^="#"]');
       navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
           e.preventDefault();
           const target = document.querySelector(this.getAttribute('href'));
           if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         });
       });
       
-      // Handle form submissions
+      // Enhanced form handling
       const forms = document.querySelectorAll('form');
       forms.forEach(form => {
         form.addEventListener('submit', function(e) {
           e.preventDefault();
-          alert('Form submitted! (This is a preview)');
+          const formData = new FormData(this);
+          const data = Object.fromEntries(formData.entries());
+          
+          // Show success feedback
+          const feedback = document.createElement('div');
+          feedback.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300';
+          feedback.innerHTML = '✓ Form submitted successfully! (Preview mode)';
+          document.body.appendChild(feedback);
+          
+          // Animate in
+          setTimeout(() => feedback.style.transform = 'translateX(0)', 10);
+          
+          // Remove after delay
+          setTimeout(() => {
+            feedback.style.transform = 'translateX(100%)';
+            setTimeout(() => feedback.remove(), 300);
+          }, 3000);
+          
+          console.log('Form data:', data);
         });
       });
       
-      // Handle button clicks
+      // Enhanced button interactions
       const buttons = document.querySelectorAll('button:not([type="submit"])');
       buttons.forEach(button => {
-        if (!button.querySelector('svg') && !button.onclick) {
+        if (!button.onclick && !button.getAttribute('data-interactive')) {
           button.addEventListener('click', function() {
-            console.log('Button clicked:', this.textContent);
+            // Add ripple effect
+            const rect = this.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            const size = Math.max(rect.height, rect.width);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (rect.width / 2 - size / 2) + 'px';
+            ripple.style.top = (rect.height / 2 - size / 2) + 'px';
+            ripple.className = 'absolute rounded-full bg-white opacity-30 animate-ping pointer-events-none';
+            
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 600);
+            
+            console.log('Button clicked:', this.textContent || this.innerHTML);
           });
         }
+      });
+      
+      // Add hover effects to interactive elements
+      const interactiveElements = document.querySelectorAll('button, a, input, textarea, select');
+      interactiveElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+          if (this.tagName === 'BUTTON' || this.tagName === 'A') {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          }
+        });
+        
+        element.addEventListener('mouseleave', function() {
+          if (this.tagName === 'BUTTON' || this.tagName === 'A') {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+          }
+        });
+      });
+      
+      // Handle todo app interactions if present
+      const todoInputs = document.querySelectorAll('input[type="checkbox"]');
+      todoInputs.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const parentItem = this.closest('div, li');
+          if (parentItem) {
+            const text = parentItem.querySelector('span');
+            if (text) {
+              if (this.checked) {
+                text.style.textDecoration = 'line-through';
+                text.style.opacity = '0.6';
+                parentItem.style.transform = 'scale(0.98)';
+              } else {
+                text.style.textDecoration = 'none';
+                text.style.opacity = '1';
+                parentItem.style.transform = 'scale(1)';
+              }
+            }
+          }
+        });
       });
     });
   </script>
@@ -272,7 +403,47 @@ export function LivePreview({ files }: LivePreviewProps) {
   const buildFromAvailableFiles = (
     files: Record<string, ProjectFile>,
   ): string => {
-    const fileList = Object.keys(files);
+    // Try to intelligently construct a preview from available files
+    const htmlFiles = Object.entries(files).filter(([path, file]) => 
+      file.type === 'html' || path.endsWith('.html')
+    );
+    const cssFiles = Object.entries(files).filter(([path, file]) => 
+      file.type === 'css' || path.endsWith('.css')
+    );
+    const jsFiles = Object.entries(files).filter(([path, file]) => 
+      file.type === 'js' || path.endsWith('.js')
+    );
+    const reactFiles = Object.entries(files).filter(([path, file]) => 
+      file.type === 'tsx' || file.type === 'jsx' || path.endsWith('.tsx') || path.endsWith('.jsx')
+    );
+
+    // Collect all CSS content
+    let styles = '';
+    cssFiles.forEach(([, file]) => {
+      styles += file.content + '\n';
+    });
+
+    // Collect all JavaScript content
+    let scripts = '';
+    jsFiles.forEach(([, file]) => {
+      scripts += file.content + '\n';
+    });
+
+    let bodyContent = '';
+
+    // If we have React files, try to extract JSX content
+    if (reactFiles.length > 0) {
+      bodyContent = extractReactContent(reactFiles);
+    }
+    // If we have HTML files, use the first one
+    else if (htmlFiles.length > 0) {
+      const [, htmlFile] = htmlFiles[0];
+      return processHtmlFile(files, htmlFile.content);
+    }
+    // Otherwise, create a meaningful preview from the file contents
+    else {
+      bodyContent = generateSmartPreview(files);
+    }
 
     return `
 <!DOCTYPE html>
@@ -280,45 +451,204 @@ export function LivePreview({ files }: LivePreviewProps) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generated Project Preview</title>
+  <title>Live Preview</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ${styles}
+    
+    /* Additional preview enhancements */
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .preview-container { min-height: 100vh; }
+  </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-8">
-  <div class="max-w-4xl mx-auto">
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-        Generated Project
-      </h1>
-      <p class="text-gray-400">Your AI-generated project is ready! Generated ${fileList.length} files.</p>
-    </div>
-    
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-      ${fileList
-        .map(
-          (filename) => `
-        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span class="text-sm font-mono text-gray-300">${filename}</span>
-          </div>
-          <div class="text-xs text-gray-500">${files[filename].type || "file"}</div>
-        </div>
-      `,
-        )
-        .join("")}
-    </div>
-    
-    <div class="text-center">
-      <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg px-4 py-2">
-        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <span class="text-blue-400 text-sm">Use the code editor to view and modify your files</span>
-      </div>
-    </div>
+<body>
+  <div class="preview-container">
+    ${bodyContent}
   </div>
+  
+  <script>
+    ${scripts}
+    
+    // Enhanced interactivity for live preview
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle navigation links
+      const navLinks = document.querySelectorAll('a[href^="#"]');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+      
+      // Handle form submissions
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = Object.fromEntries(formData.entries());
+          console.log('Form submitted with data:', data);
+          
+          // Show feedback
+          const feedback = document.createElement('div');
+          feedback.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+          feedback.textContent = 'Form submitted successfully! (Preview mode)';
+          document.body.appendChild(feedback);
+          setTimeout(() => feedback.remove(), 3000);
+        });
+      });
+      
+      // Handle interactive elements
+      const buttons = document.querySelectorAll('button:not([type="submit"])');
+      buttons.forEach(button => {
+        if (!button.onclick && !button.getAttribute('data-interactive')) {
+          button.addEventListener('click', function() {
+            console.log('Button clicked:', this.textContent || this.innerHTML);
+            // Add ripple effect
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => this.style.transform = '', 150);
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>`;
+  };
+
+  const extractReactContent = (reactFiles: [string, ProjectFile][]): string => {
+    // Take the first React file and try to extract renderable content
+    const [, firstReactFile] = reactFiles[0];
+    const content = firstReactFile.content;
+    
+    // Look for JSX return statement
+    const jsxMatch = content.match(/return\s*\(([\s\S]*?)\);?\s*\}/);
+    if (jsxMatch) {
+      return jsxMatch[1]
+        .replace(/className=/g, 'class=')
+        .replace(/htmlFor=/g, 'for=')
+        .replace(/{`([^`]*)`}/g, '$1')
+        .replace(/{([^}]*)}/g, (match, p1) => {
+          // Handle simple string values and remove complex expressions
+          if (p1.match(/^["'].*["']$/)) return p1.slice(1, -1);
+          if (p1.match(/^\d+$/)) return p1;
+          return '';
+        });
+    }
+    
+    // Fallback: look for JSX-like content in the file
+    const jsxLikeContent = content.match(/<[^>]+>[\s\S]*<\/[^>]+>/);
+    if (jsxLikeContent) {
+      return jsxLikeContent[0]
+        .replace(/className=/g, 'class=')
+        .replace(/htmlFor=/g, 'for=');
+    }
+    
+    return generateSmartPreview({ [reactFiles[0][0]]: reactFiles[0][1] });
+  };
+
+  const generateSmartPreview = (files: Record<string, ProjectFile>): string => {
+    const fileEntries = Object.entries(files);
+    
+    // Try to detect what kind of app this might be based on content
+    const allContent = fileEntries.map(([, file]) => file.content).join(' ').toLowerCase();
+    
+    if (allContent.includes('todo') || allContent.includes('task')) {
+      return `
+        <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+          <div class="max-w-2xl mx-auto">
+            <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Todo App</h1>
+            <div class="bg-white rounded-xl shadow-lg p-6">
+              <div class="mb-4">
+                <input type="text" placeholder="Add a new todo..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div class="space-y-2">
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                  <input type="checkbox" class="mr-3">
+                  <span>Sample todo item</span>
+                </div>
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                  <input type="checkbox" checked class="mr-3">
+                  <span class="line-through text-gray-500">Completed todo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+    
+    if (allContent.includes('portfolio') || allContent.includes('about') || allContent.includes('contact')) {
+      return `
+        <div class="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900">
+          <nav class="p-6">
+            <div class="flex justify-between items-center max-w-6xl mx-auto">
+              <h1 class="text-2xl font-bold text-white">Portfolio</h1>
+              <div class="space-x-6 text-white">
+                <a href="#about" class="hover:text-purple-300">About</a>
+                <a href="#projects" class="hover:text-purple-300">Projects</a>
+                <a href="#contact" class="hover:text-purple-300">Contact</a>
+              </div>
+            </div>
+          </nav>
+          <div class="flex items-center justify-center min-h-[80vh] px-6">
+            <div class="text-center max-w-4xl">
+              <h2 class="text-6xl font-bold mb-6 text-white">Your Portfolio</h2>
+              <p class="text-xl text-purple-200 mb-8">Welcome to your AI-generated portfolio website</p>
+              <button class="bg-white text-purple-900 px-8 py-3 rounded-full font-semibold hover:bg-purple-100 transition-colors">
+                View My Work
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+    
+    // Generic preview for other types of content
+    return `
+      <div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
+              Live Preview
+            </h1>
+            <p class="text-xl text-gray-300">Your generated application is ready</p>
+          </div>
+          
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+              <h3 class="text-2xl font-bold mb-4 text-blue-400">Generated Files</h3>
+              <div class="space-y-3">
+                ${Object.keys(files).slice(0, 5).map(filename => `
+                  <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
+                    <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    <span class="font-mono text-sm">${filename}</span>
+                  </div>
+                `).join('')}
+                ${Object.keys(files).length > 5 ? `
+                  <div class="text-center text-gray-400 text-sm pt-2">
+                    ... and ${Object.keys(files).length - 5} more files
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+            
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+              <h3 class="text-2xl font-bold mb-4 text-green-400">Interactive Preview</h3>
+              <p class="text-gray-300 mb-4">
+                This is a live preview of your generated application. 
+                Edit your files in the code editor to see changes in real-time!
+              </p>
+              <div class="mt-6">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors w-full">
+                  Explore Your App
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
   };
 
   const generateFallbackContent = (
