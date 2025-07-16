@@ -344,7 +344,11 @@ export default function Editor() {
             />
 
             {/* Code Editor Panel */}
-            <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
+            <ResizablePanel
+              defaultSize={panelSizes[1]}
+              minSize={30}
+              maxSize={60}
+            >
               <CodeEditor
                 files={files}
                 selectedFile={selectedFile}
@@ -359,7 +363,11 @@ export default function Editor() {
             />
 
             {/* Live Preview Panel */}
-            <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
+            <ResizablePanel
+              defaultSize={panelSizes[2]}
+              minSize={20}
+              maxSize={50}
+            >
               <LivePreview files={files} />
             </ResizablePanel>
           </ResizablePanelGroup>
