@@ -318,7 +318,9 @@ export function ChatAgent({
                       <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"></div>
                     </div>
                     <span>
-                      {isAIGenerating ? "Generating project..." : "Thinking..."}
+                      {isAIGenerating
+                        ? "Generating with Gemini..."
+                        : "Thinking..."}
                     </span>
                   </div>
                 </CardContent>
