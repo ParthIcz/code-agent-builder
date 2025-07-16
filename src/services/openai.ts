@@ -31,7 +31,8 @@ class OpenAIService {
   private apiKey: string;
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    this.apiKey = "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";
+    
     if (!this.apiKey) {
       throw new Error(
         "OpenAI API key not found. Please set VITE_OPENAI_API_KEY in your .env.local file",
