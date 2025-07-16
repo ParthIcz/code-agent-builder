@@ -31,7 +31,8 @@ class OpenAIService {
   private apiKey: string;
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    this.apiKey = "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
+";
 
     if (!this.apiKey) {
       throw new Error(
@@ -69,28 +70,6 @@ class OpenAIService {
           const errorMessage =
             error.response?.data?.error?.message || error.message;
           console.warn(`Model ${model} failed: ${errorMessage}`);
-
-          // Handle specific error types that shouldn't retry other models
-          if (errorMessage.includes("exceeded your current quota")) {
-            throw new Error(
-              `🚫 OpenAI Quota Exceeded\n\nYour API key has hit the usage limit. To fix this:\n\n1. Check your OpenAI billing at: https://platform.openai.com/account/billing\n2. Add payment method or increase limits\n3. Or get a new API key at: https://platform.openai.com/api-keys\n4. Update your .env.local file with the new key\n5. Restart the development server\n\nError: ${errorMessage}`,
-            );
-          }
-
-          if (
-            errorMessage.includes("invalid") &&
-            errorMessage.includes("api")
-          ) {
-            throw new Error(
-              `🔑 Invalid API Key\n\nYour OpenAI API key appears to be invalid. To fix this:\n\n1. Get a new API key at: https://platform.openai.com/api-keys\n2. Update your .env.local file: VITE_OPENAI_API_KEY=sk-your-new-key\n3. Restart the development server\n\nError: ${errorMessage}`,
-            );
-          }
-
-          if (errorMessage.includes("rate limit")) {
-            throw new Error(
-              `⏰ Rate Limit Exceeded\n\nYou're making requests too quickly. Please wait a moment and try again.\n\nError: ${errorMessage}`,
-            );
-          }
 
           // If it's not a model access issue, don't try other models
           if (
