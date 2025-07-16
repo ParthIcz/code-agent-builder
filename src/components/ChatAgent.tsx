@@ -187,7 +187,9 @@ export function ChatAgent({
               AI Assistant
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              {isGenerating ? "Generating..." : "Ready to help"}
+              {isGenerating || isAIGenerating
+                ? "Generating..."
+                : "Ready to help"}
             </p>
           </div>
           {isGenerating && (
