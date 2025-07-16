@@ -95,7 +95,7 @@ export default function Editor() {
       {
         id: "welcome-1",
         type: "system",
-        content: `🤖 Welcome to AI Code Builder! Describe what you want to build and I'll generate the complete project for you.`,
+        content: `🤖 Welcome to Gemini Code Builder! Describe what you want to build and I'll generate the complete project for you using Google's Gemini AI.`,
         timestamp: new Date(),
       },
     ]);
