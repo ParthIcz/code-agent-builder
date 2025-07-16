@@ -12,6 +12,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "react-resizable-panels";
+import {
   Download,
   Play,
   Sun,
