@@ -491,7 +491,17 @@ export function LivePreview({ files }: LivePreviewProps) {
             </Card>
           </div>
         ) : isVisible ? (
-          <div className="h-full flex justify-center">
+          <div className="h-full flex justify-center relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-card/80 backdrop-blur-sm flex items-center justify-center z-10">
+                <div className="flex items-center gap-3 bg-card border border-border rounded-lg px-4 py-3 shadow-lg">
+                  <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-sm font-medium">
+                    Updating preview...
+                  </span>
+                </div>
+              </div>
+            )}
             <div
               style={getViewportStyles()}
               className="transition-all duration-300 ease-in-out border-l border-r border-border/50"
