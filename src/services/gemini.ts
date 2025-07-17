@@ -31,16 +31,18 @@ class GeminiService {
       this.apiKey ? `${this.apiKey.substring(0, 10)}...` : "NOT FOUND",
     );
 
-    if (!this.apiKey) {
-      throw new Error(
-        "Gemini API key not found. Please set VITE_GEMINI_API_KEY in your .env.local file",
-      );
-    }
-
-    if (!this.apiKey.startsWith("AIza")) {
+    if (this.apiKey && !this.apiKey.startsWith("AIza")) {
       console.warn(
         '⚠️ Gemini API key should start with "AIza". Current key:',
         this.apiKey.substring(0, 10) + "...",
+      );
+    }
+  }
+
+  private checkApiKey() {
+    if (!this.apiKey) {
+      throw new Error(
+        "Gemini API key not found. Please set VITE_GEMINI_API_KEY in your .env.local file",
       );
     }
   }
@@ -117,13 +119,9 @@ class GeminiService {
         // Extract error message from various possible structures
         let errorMessage = "";
         if (errorData && typeof errorData === "object") {
-          if (
-            typeof (errorData as any).error?.message === "string"
-          ) {
+          if (typeof (errorData as any).error?.message === "string") {
             errorMessage = (errorData as any).error.message;
-          } else if (
-            typeof (errorData as any).message === "string"
-          ) {
+          } else if (typeof (errorData as any).message === "string") {
             errorMessage = (errorData as any).message;
           } else if ((errorData as any).error) {
             errorMessage = JSON.stringify((errorData as any).error);
