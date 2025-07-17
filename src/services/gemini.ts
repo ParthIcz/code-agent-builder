@@ -25,18 +25,12 @@ class GeminiService {
   private apiKey: string;
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
+    // Use the provided static API key
+    this.apiKey = "AIzaSyANdISWIVOmI6IP517D8lJNJWtIJOeVO3U";
     console.log(
       "Gemini API Key loaded:",
       this.apiKey ? `${this.apiKey.substring(0, 10)}...` : "NOT FOUND",
     );
-
-    if (this.apiKey && !this.apiKey.startsWith("AIza")) {
-      console.warn(
-        '⚠️ Gemini API key should start with "AIza". Current key:',
-        this.apiKey.substring(0, 10) + "...",
-      );
-    }
   }
 
   private checkApiKey() {
