@@ -216,88 +216,93 @@ export default function Editor() {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Mobile Navigation */}
+              {/* Mobile Navigation - Only Chat, Code, Preview */}
               <div className="flex lg:hidden gap-1">
                 <Button
                   variant={activePanel === "chat" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("chat")}
-                  className="flex items-center gap-1 px-2 py-2 h-auto"
+                  className="flex items-center justify-center p-2 h-10 w-10"
+                  title="Chat"
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span className="text-xs">Chat</span>
                 </Button>
                 <Button
                   variant={activePanel === "code" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("code")}
-                  className="flex items-center gap-1 px-2 py-2 h-auto"
+                  className="flex items-center justify-center p-2 h-10 w-10"
+                  title="Code"
                 >
                   <Code className="h-4 w-4" />
-                  <span className="text-xs">Code</span>
                 </Button>
                 <Button
                   variant={activePanel === "preview" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("preview")}
-                  className="flex items-center gap-1 px-2 py-2 h-auto"
+                  className="flex items-center justify-center p-2 h-10 w-10"
+                  title="Preview"
                 >
                   <Eye className="h-4 w-4" />
-                  <span className="text-xs">View</span>
                 </Button>
               </div>
 
-              <div className="w-px h-6 bg-border hidden lg:block" />
+              {/* Desktop Actions */}
+              <div className="hidden lg:flex items-center gap-2">
+                <div className="w-px h-6 bg-border" />
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleTheme}
-                className="flex items-center gap-2 px-3 py-2 h-auto"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-                <span className="hidden sm:inline text-sm">
-                  {theme === "dark" ? "Light" : "Dark"}
-                </span>
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleTheme}
+                  className="flex items-center gap-2 px-3 py-2 h-auto"
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <Moon className="h-4 w-4" />
+                  )}
+                  <span className="text-sm">
+                    {theme === "dark" ? "Light" : "Dark"}
+                  </span>
+                </Button>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownload}
-                className="flex items-center gap-2 px-3 py-2 h-auto"
-              >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">Download</span>
-                <span className="sm:hidden text-xs">ZIP</span>
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 px-3 py-2 h-auto"
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="text-sm">Download</span>
+                </Button>
+              </div>
 
-              {/* Mobile Chat Toggle */}
-              <Sheet open={chatOpen} onOpenChange={setChatOpen}>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="lg:hidden flex items-center gap-1 px-2 py-2 h-auto"
-                  >
-                    <Menu className="h-4 w-4" />
-                    <span className="text-xs">Menu</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-80 p-0">
-                  <SheetTitle className="sr-only">AI Chat Assistant</SheetTitle>
-                  <ChatAgent
-                    messages={chatMessages}
-                    onSubmit={handleChatSubmit}
-                    isGenerating={isGenerating}
-                    onProjectGenerated={handleProjectGenerated}
-                  />
-                </SheetContent>
-              </Sheet>
+              {/* Mobile Additional Actions */}
+              <div className="lg:hidden flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleTheme}
+                  className="flex items-center justify-center p-2 h-10 w-10"
+                  title={theme === "dark" ? "Light Mode" : "Dark Mode"}
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <Moon className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownload}
+                  className="flex items-center justify-center p-2 h-10 w-10"
+                  title="Download ZIP"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
