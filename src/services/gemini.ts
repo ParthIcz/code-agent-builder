@@ -25,7 +25,7 @@ class GeminiService {
   private apiKey: string;
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
     console.log(
       "Gemini API Key loaded:",
       this.apiKey ? `${this.apiKey.substring(0, 10)}...` : "NOT FOUND",
@@ -117,12 +117,16 @@ class GeminiService {
         // Extract error message from various possible structures
         let errorMessage = "";
         if (errorData && typeof errorData === "object") {
-          if (errorData.error?.message) {
-            errorMessage = errorData.error.message;
-          } else if (errorData.message) {
-            errorMessage = errorData.message;
-          } else if (errorData.error) {
-            errorMessage = JSON.stringify(errorData.error);
+          if (
+            typeof (errorData as any).error?.message === "string"
+          ) {
+            errorMessage = (errorData as any).error.message;
+          } else if (
+            typeof (errorData as any).message === "string"
+          ) {
+            errorMessage = (errorData as any).message;
+          } else if ((errorData as any).error) {
+            errorMessage = JSON.stringify((errorData as any).error);
           } else {
             errorMessage = JSON.stringify(errorData);
           }
