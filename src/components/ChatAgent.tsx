@@ -174,8 +174,8 @@ export function ChatAgent({
     }
   };
 
-  return (
-    <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm">
+    return (
+    <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm overflow-hidden">
       {/* Header */}
       <div className="flex-shrink-0 p-4 border-b border-border bg-card/50">
         <div className="flex items-center gap-3">
@@ -203,8 +203,8 @@ export function ChatAgent({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 min-h-0 p-2 sm:p-4">
-        <div className="space-y-3 sm:space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 sm:p-4">
+        <div className="space-y-3 sm:space-y-4 min-w-0">
           {messages.length === 0 && (
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 mx-2 sm:mx-0">
               <CardContent className="p-4 sm:p-6">
