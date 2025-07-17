@@ -63,48 +63,47 @@ const Index = () => {
 
       {/* Header */}
       <header className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-md">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 rounded-xl glow-gradient border border-purple-500/30 shadow-2xl">
-                <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-white animate-pulse-glow" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+          <div className="flex items-center justify-between min-h-[60px]">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="p-2 sm:p-3 rounded-xl glow-gradient border border-purple-500/30 shadow-2xl">
+                <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-white animate-pulse-glow" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-bold glow-gradient bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
                   AI Code Builder
                 </h1>
-                <p className="text-xs text-gray-300 hidden sm:block">
+                <p className="text-xs sm:text-sm text-gray-300">
                   Build with AI • Ship faster
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden lg:flex text-gray-300 hover:text-white border-white/20 hover:border-white/40"
+                className="flex text-gray-300 hover:text-white border-white/20 hover:border-white/40 px-3 py-2 h-auto"
               >
                 <Github className="h-4 w-4 mr-2" />
-                GitHub
+                <span className="hidden sm:inline">GitHub</span>
+                <span className="sm:hidden">Git</span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/login")}
-                className="text-gray-300 hover:text-white border-white/20 hover:border-white/40 text-xs sm:text-sm px-2 sm:px-3"
+                className="text-gray-300 hover:text-white border-white/20 hover:border-white/40 px-3 py-2 h-auto"
               >
-                <span className="hidden xs:inline">Sign In</span>
-                <span className="xs:hidden">In</span>
+                Sign In
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate("/signup")}
-                className="expensive-gradient text-white border-0 hover:opacity-90 shadow-lg text-xs sm:text-sm px-2 sm:px-3"
+                className="expensive-gradient text-white border-0 hover:opacity-90 shadow-lg px-4 py-2 h-auto"
               >
-                <span className="hidden xs:inline">Sign Up</span>
-                <span className="xs:hidden">Up</span>
+                Sign Up
               </Button>
             </div>
           </div>
