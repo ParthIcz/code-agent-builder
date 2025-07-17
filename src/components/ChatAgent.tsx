@@ -203,7 +203,7 @@ export function ChatAgent({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 sm:p-4">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 sm:p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border/50 hover:scrollbar-thumb-border/70">
         <div className="space-y-3 sm:space-y-4 min-w-0">
           {messages.length === 0 && (
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 mx-2 sm:mx-0">
