@@ -94,6 +94,15 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => navigate("/projects")}
+                className="text-gray-300 hover:text-white border-white/20 hover:border-white/40 px-3 py-2 h-auto"
+              >
+                <Code className="h-4 w-4 mr-2" />
+                Projects
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 className="flex text-gray-300 hover:text-white border-white/20 hover:border-white/40 px-3 py-2 h-auto"
               >
                 <Github className="h-4 w-4 mr-2" />
