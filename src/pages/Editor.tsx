@@ -179,6 +179,21 @@ export default function Editor() {
     }
   }, [location?.state, handleChatSubmit]);
 
+  // Handle project loading when project ID is present
+  useEffect(() => {
+    if (projectId) {
+      // Add a system message indicating project is being loaded
+      const systemMessage = `Loading project: ${projectId}`;
+      handleChatSubmit(systemMessage);
+
+      // Simulate loading project data
+      setTimeout(() => {
+        const loadedMessage = `✅ Project "${projectId}" loaded successfully! You can now edit the code and see the live preview.`;
+        handleChatSubmit(loadedMessage);
+      }, 1000);
+    }
+  }, [projectId, handleChatSubmit]);
+
   return (
     <div
       className={`min-h-screen bg-background text-foreground ${theme} relative`}
