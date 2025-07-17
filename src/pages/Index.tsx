@@ -106,15 +106,6 @@ const Index = () => {
                 <span className="hidden xs:inline">Sign Up</span>
                 <span className="xs:hidden">Up</span>
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("/editor")}
-                className="glow-gradient text-white border-0 hover:opacity-90 shadow-lg text-xs sm:text-sm px-2 sm:px-3"
-              >
-                <span className="hidden sm:inline">Open Editor</span>
-                <span className="sm:hidden">Editor</span>
-              </Button>
             </div>
           </div>
         </div>
