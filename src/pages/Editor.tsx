@@ -228,13 +228,14 @@ export default function Editor() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               {/* Mobile Navigation */}
-              <div className="flex lg:hidden">
+              <div className="flex lg:hidden gap-1">
                 <Button
                   variant={activePanel === "chat" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("chat")}
+                  className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                 >
                   <MessageSquare className="h-4 w-4" />
                 </Button>
@@ -242,6 +243,7 @@ export default function Editor() {
                   variant={activePanel === "code" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("code")}
+                  className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                 >
                   <Code className="h-4 w-4" />
                 </Button>
@@ -249,6 +251,7 @@ export default function Editor() {
                   variant={activePanel === "preview" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("preview")}
+                  className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
