@@ -94,13 +94,13 @@ const Login = () => {
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-md mx-auto px-2 sm:px-0">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="p-3 rounded-xl glow-gradient border border-purple-500/30 shadow-2xl">
-              <Sparkles className="h-8 w-8 text-white animate-pulse-glow" />
+        <div className="text-center mb-6 sm:mb-8 mt-12 sm:mt-0">
+          <div className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="p-2 sm:p-3 rounded-xl glow-gradient border border-purple-500/30 shadow-2xl">
+              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-pulse-glow" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold glow-gradient bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
                 AI Code Builder
               </h1>
               <p className="text-xs text-gray-300">Premium AI Platform</p>
@@ -108,8 +108,10 @@ const Login = () => {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
-            <p className="text-gray-300">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              Welcome Back
+            </h2>
+            <p className="text-gray-300 text-sm sm:text-base px-2 sm:px-0">
               Sign in to your premium account and continue building
               extraordinary applications
             </p>
