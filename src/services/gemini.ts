@@ -287,13 +287,10 @@ Features: ${request.features?.join(", ") || "Standard features"}`;
   }
 
   async improveCode(code: string, instructions: string): Promise<string> {
-    const prompt = `You are an expert developer. Improve the provided code based on the user's instructions. Return only the improved code without explanations or markdown formatting.
+    const prompt = `Improve the provided code based on the instructions. Return only the improved code without explanations or markdown formatting.
 
-Please improve this code:
-
-\`\`\`
+Code to improve:
 ${code}
-\`\`\`
 
 Instructions: ${instructions}
 
@@ -303,13 +300,10 @@ Return only the improved code.`;
   }
 
   async fixErrors(code: string, errorMessage: string): Promise<string> {
-    const prompt = `You are an expert developer. Fix the errors in the provided code. Return only the corrected code without explanations or markdown formatting.
+    const prompt = `Fix the errors in the provided code. Return only the corrected code without explanations or markdown formatting.
 
-Please fix the errors in this code:
-
-\`\`\`
+Code with errors:
 ${code}
-\`\`\`
 
 Error: ${errorMessage}
 
@@ -322,16 +316,12 @@ Return only the corrected code.`;
     existingCode: string,
     featureDescription: string,
   ): Promise<string> {
-    const prompt = `You are an expert developer. Add the requested feature to the existing code. Return only the updated code without explanations or markdown formatting.
+    const prompt = `Add the requested feature to the existing code. Return only the updated code without explanations or markdown formatting.
 
-Add this feature to the existing code:
-
-Feature: ${featureDescription}
+Feature to add: ${featureDescription}
 
 Existing code:
-\`\`\`
 ${existingCode}
-\`\`\`
 
 Return only the updated code with the new feature added.`;
 
