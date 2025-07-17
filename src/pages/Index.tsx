@@ -74,6 +74,7 @@ const Index = () => {
       <header className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
           <div className="flex items-center justify-between min-h-[60px]">
+            {/* Logo and Brand */}
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="p-2 sm:p-3 rounded-xl glow-gradient border border-purple-500/30 shadow-2xl">
                 <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-white animate-pulse-glow" />
@@ -88,15 +89,15 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-2 sm:gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 className="flex text-gray-300 hover:text-white border-white/20 hover:border-white/40 px-3 py-2 h-auto"
               >
                 <Github className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">GitHub</span>
-                <span className="sm:hidden">Git</span>
+                GitHub
               </Button>
               <Button
                 variant="ghost"
@@ -115,6 +116,98 @@ const Index = () => {
                 Sign Up
               </Button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="md:hidden text-gray-300 hover:text-white border-white/20 hover:border-white/40 px-3 py-2 h-auto"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                className="w-80 expensive-gradient border-l border-purple-500/30"
+              >
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <div className="flex flex-col h-full">
+                  {/* Mobile Menu Header */}
+                  <div className="flex items-center justify-between p-6 border-b border-purple-500/20">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-xl glow-gradient border border-purple-500/30 shadow-xl">
+                        <Sparkles className="h-6 w-6 text-white animate-pulse-glow" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold glow-gradient bg-clip-text text-transparent">
+                          AI Code Builder
+                        </h2>
+                        <p className="text-xs text-purple-200">
+                          Premium AI Platform
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile Menu Items */}
+                  <div className="flex-1 p-6">
+                    <div className="space-y-4">
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        className="w-full justify-start text-white hover:text-white hover:luxury-gradient border border-purple-400/20 hover:border-purple-300/40 h-auto py-4"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          navigate("/login");
+                        }}
+                      >
+                        <span className="text-lg">Sign In</span>
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full justify-start glow-gradient text-white border-0 hover:opacity-90 shadow-xl h-auto py-4"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          navigate("/signup");
+                        }}
+                      >
+                        <span className="text-lg">Sign Up</span>
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        className="w-full justify-start text-white hover:text-white hover:luxury-gradient border border-purple-400/20 hover:border-purple-300/40 h-auto py-4"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Github className="h-5 w-5 mr-3" />
+                        <span className="text-lg">GitHub</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Mobile Menu Footer */}
+                  <div className="p-6 border-t border-purple-500/20">
+                    <div className="text-center">
+                      <p className="text-sm text-purple-200">
+                        Premium AI-powered development
+                      </p>
+                      <div className="flex items-center justify-center gap-2 mt-2">
+                        <Sparkles className="h-4 w-4 text-purple-300" />
+                        <span className="text-xs text-purple-300">
+                          Build • Ship • Scale
+                        </span>
+                        <Sparkles className="h-4 w-4 text-purple-300" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
