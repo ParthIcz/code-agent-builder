@@ -37,6 +37,10 @@ export default function Editor() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Get project ID from URL parameters
+  const urlParams = new URLSearchParams(location.search);
+  const projectId = urlParams.get("project");
+
   // Counter to ensure unique message IDs
   const messageIdRef = useRef(0);
   const [files, setFiles] = useState<Record<string, ProjectFile>>({});
