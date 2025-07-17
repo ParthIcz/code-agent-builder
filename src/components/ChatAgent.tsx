@@ -355,17 +355,18 @@ export function ChatAgent({
           </div>
 
           {/* Quick Actions */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 overflow-hidden">
             {quickPrompts.slice(0, 2).map((prompt, index) => (
               <Button
                 key={index}
                 variant="outline"
                 size="sm"
-                className="text-xs h-8 px-3 border-border/50 hover:border-primary/50"
+                className="text-xs h-8 px-3 border-border/50 hover:border-primary/50 truncate max-w-full"
                 onClick={() => setInput(prompt)}
                 disabled={isGenerating || isAIGenerating}
+                title={prompt}
               >
-                {prompt}
+                <span className="truncate">{prompt}</span>
               </Button>
             ))}
           </div>
