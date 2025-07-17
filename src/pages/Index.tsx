@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 const Index = () => {
   const navigate = useNavigate();
   const [chatInput, setChatInput] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleChatSubmit = (e: React.FormEvent) => {
     e.preventDefault();
