@@ -183,9 +183,9 @@ export default function Editor() {
       <div className="absolute inset-0 luxury-gradient opacity-10 pointer-events-none" />
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 relative z-10">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 relative z-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 variant="ghost"
                 size="icon"
@@ -196,7 +196,7 @@ export default function Editor() {
                     window.location.href = "/";
                   }
                 }}
-                className="lg:hidden"
+                className="lg:hidden h-8 w-8 sm:h-10 sm:w-10"
               >
                 <Home className="h-4 w-4" />
               </Button>
@@ -220,11 +220,11 @@ export default function Editor() {
                 <div className="w-px h-4 bg-border" />
               </div>
 
-              <h1 className="text-xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
-                Gemini Code Builder
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
+                AI Code Builder
               </h1>
-              <div className="hidden sm:block text-sm text-muted-foreground">
-                Build with Gemini AI • Edit • Preview
+              <div className="hidden md:block text-sm text-muted-foreground">
+                Build with AI • Edit • Preview
               </div>
             </div>
 
