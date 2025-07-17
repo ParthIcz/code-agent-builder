@@ -174,7 +174,7 @@ export function ChatAgent({
     }
   };
 
-    return (
+  return (
     <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm overflow-hidden">
       {/* Header */}
       <div className="flex-shrink-0 p-4 border-b border-border bg-card/50">
@@ -329,7 +329,7 @@ export function ChatAgent({
           )}
         </div>
         <div ref={scrollRef} />
-      </ScrollArea>
+      </div>
 
       {/* Input Section */}
       <div className="flex-shrink-0 p-3 sm:p-4 border-t border-border bg-card/50">
