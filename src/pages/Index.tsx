@@ -89,10 +89,26 @@ const Index = () => {
                 GitHub
               </Button>
               <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/login")}
+                className="text-gray-300 hover:text-white border-white/20 hover:border-white/40"
+              >
+                Sign In
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/signup")}
+                className="expensive-gradient text-white border-0 hover:opacity-90 shadow-lg"
+              >
+                Sign Up
+              </Button>
+              <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate("/editor")}
-                className="expensive-gradient text-white border-0 hover:opacity-90 shadow-lg"
+                className="glow-gradient text-white border-0 hover:opacity-90 shadow-lg"
               >
                 Open Editor
               </Button>
