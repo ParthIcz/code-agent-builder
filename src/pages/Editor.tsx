@@ -182,7 +182,7 @@ export default function Editor() {
       {/* Subtle gradient background overlay */}
       <div className="absolute inset-0 luxury-gradient opacity-10 pointer-events-none" />
       {/* Header */}
-      <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-[200]">
         <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5 relative z-10">
           <div className="flex items-center justify-between min-h-[60px]">
             <div className="flex items-center gap-3 sm:gap-4">
