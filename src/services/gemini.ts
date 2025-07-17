@@ -204,73 +204,83 @@ class GeminiService {
   async generateProject(
     request: ProjectGenerationRequest,
   ): Promise<GeneratedProject> {
-    const prompt = `You are an expert full-stack developer. Generate a complete, production-ready project based on the user's requirements.
+    const prompt = `Create a complete web project based on the following description: ${request.description}.
 
-IMPORTANT: Return ONLY a valid JSON object with this exact structure:
-{
-  "name": "project-name",
-  "description": "brief description",
-  "files": {
-    "filename.ext": {
-      "content": "complete file content",
-      "type": "file extension"
-    }
-  }
-}
+Respond with a JSON array of file objects. Each object must contain:
+- 'path': string (full relative file path including folders)
+- 'content': string (full source code for that file)
+
+Only return JSON. Do not include markdown formatting, extra explanation, or plain text — only a valid JSON array of file objects.
 
 Requirements:
-- Use modern React/Next.js with TypeScript
-- Include Tailwind CSS for styling
-- Use shadcn/ui components where appropriate
+- Use modern React/Next.js with TypeScript if applicable
+- Include Tailwind CSS for styling when appropriate
 - Include proper error handling and loading states
 - Make it responsive and accessible
 - Include proper imports and exports
 - Generate complete, working code (no placeholders or comments like "// TODO")
-- Include package.json with all required dependencies
-- Use modern ES6+ syntax and React best practices
+- Include package.json with all required dependencies when building React/Node projects
+- Use modern ES6+ syntax and best practices
 
-Generate a ${request.projectType || "web application"} project with the following requirements:
-
-Description: ${request.description}
-Framework: ${request.framework || "React/Next.js"}
-Styling: ${request.styling || "Tailwind CSS"}
-Features: ${request.features?.join(", ") || "Standard features"}
-
-Generate a complete project with all necessary files including:
-- Component files (.tsx)
-- Styling files (.css)
-- Configuration files (package.json, etc.)
-- Type definitions if needed
-- Proper file structure and organization
-
-Make sure all code is complete, functional, and follows modern best practices.
-
-Return ONLY the JSON object, no additional text or formatting.`;
+Project Type: ${request.projectType || "web application"}
+Framework: ${request.framework || "HTML/CSS/JS"}
+Styling: ${request.styling || "CSS"}
+Features: ${request.features?.join(", ") || "Standard features"}`;
 
     try {
       const response = await this.callGemini(prompt);
 
-      // Parse the JSON response
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error("Invalid response format from Gemini API");
+      // Parse the JSON response - look for JSON array
+      let jsonData;
+
+      // Try to find JSON array in the response
+      const jsonArrayMatch = response.match(/\[[\s\S]*\]/);
+      if (jsonArrayMatch) {
+        jsonData = JSON.parse(jsonArrayMatch[0]);
+      } else {
+        // Fallback: try to parse the entire response
+        jsonData = JSON.parse(response);
       }
 
-      const projectData = JSON.parse(jsonMatch[0]);
-
-      // Validate the response structure
-      if (
-        !projectData.name ||
-        !projectData.files ||
-        typeof projectData.files !== "object"
-      ) {
-        throw new Error("Invalid project structure from Gemini API");
+      // Validate that we got an array
+      if (!Array.isArray(jsonData)) {
+        throw new Error("Expected JSON array of file objects");
       }
 
-      return projectData as GeneratedProject;
+      // Convert the new format to the old format for compatibility
+      const files: Record<string, { content: string; type: string }> = {};
+
+      jsonData.forEach((fileObj: any) => {
+        if (fileObj.path && fileObj.content) {
+          const extension = fileObj.path.split(".").pop() || "txt";
+          files[fileObj.path] = {
+            content: fileObj.content,
+            type: extension,
+          };
+        }
+      });
+
+      // Generate a project name from the description
+      const projectName =
+        request.description
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, "")
+          .replace(/\s+/g, "-")
+          .substring(0, 50) || "generated-project";
+
+      const projectData: GeneratedProject = {
+        name: projectName,
+        description: request.description,
+        files: files,
+      };
+
+      return projectData;
     } catch (error) {
+      console.error("Gemini parsing error:", error);
       if (error instanceof SyntaxError) {
-        throw new Error("Failed to parse Gemini response as JSON");
+        throw new Error(
+          "Failed to parse Gemini response as JSON. Please try again.",
+        );
       }
       throw error;
     }
