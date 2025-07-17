@@ -215,60 +215,77 @@ export default function Editor() {
               </div>
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Mobile Navigation */}
               <div className="flex lg:hidden gap-1">
                 <Button
                   variant={activePanel === "chat" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("chat")}
-                  className="h-8 w-8 p-0 sm:h-9 sm:w-9"
+                  className="flex items-center gap-1 px-2 py-2 h-auto"
                 >
                   <MessageSquare className="h-4 w-4" />
+                  <span className="text-xs">Chat</span>
                 </Button>
                 <Button
                   variant={activePanel === "code" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("code")}
-                  className="h-8 w-8 p-0 sm:h-9 sm:w-9"
+                  className="flex items-center gap-1 px-2 py-2 h-auto"
                 >
                   <Code className="h-4 w-4" />
+                  <span className="text-xs">Code</span>
                 </Button>
                 <Button
                   variant={activePanel === "preview" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("preview")}
-                  className="h-8 w-8 p-0 sm:h-9 sm:w-9"
+                  className="flex items-center gap-1 px-2 py-2 h-auto"
                 >
                   <Eye className="h-4 w-4" />
+                  <span className="text-xs">View</span>
                 </Button>
               </div>
 
-              <div className="w-px h-4 bg-border hidden sm:block" />
+              <div className="w-px h-6 bg-border hidden lg:block" />
 
-              <Button variant="outline" size="sm" onClick={toggleTheme}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleTheme}
+                className="flex items-center gap-2 px-3 py-2 h-auto"
+              >
                 {theme === "dark" ? (
                   <Sun className="h-4 w-4" />
                 ) : (
                   <Moon className="h-4 w-4" />
                 )}
+                <span className="hidden sm:inline text-sm">
+                  {theme === "dark" ? "Light" : "Dark"}
+                </span>
               </Button>
 
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleDownload}
-                className="hidden sm:flex"
+                className="flex items-center gap-2 px-3 py-2 h-auto"
               >
-                <Download className="h-4 w-4 mr-2" />
-                <span className="hidden md:inline">Download ZIP</span>
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Download</span>
+                <span className="sm:hidden text-xs">ZIP</span>
               </Button>
 
               {/* Mobile Chat Toggle */}
               <Sheet open={chatOpen} onOpenChange={setChatOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="lg:hidden">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="lg:hidden flex items-center gap-1 px-2 py-2 h-auto"
+                  >
                     <Menu className="h-4 w-4" />
+                    <span className="text-xs">Menu</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-80 p-0">
