@@ -169,6 +169,19 @@ const Index = () => {
                         className="w-full justify-start text-white hover:text-white hover:luxury-gradient border border-purple-400/20 hover:border-purple-300/40 h-auto py-4"
                         onClick={() => {
                           setMobileMenuOpen(false);
+                          navigate("/projects");
+                        }}
+                      >
+                        <Code className="h-5 w-5 mr-3" />
+                        <span className="text-lg">My Projects</span>
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        className="w-full justify-start text-white hover:text-white hover:luxury-gradient border border-purple-400/20 hover:border-purple-300/40 h-auto py-4"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
                           navigate("/login");
                         }}
                       >
