@@ -276,13 +276,13 @@ export function ChatAgent({
               )}
 
               <div
-                className={`max-w-[85%] sm:max-w-[80%] ${message.type === "user" ? "order-first" : ""}`}
+                className={`max-w-[85%] sm:max-w-[80%] min-w-0 ${message.type === "user" ? "order-first" : ""}`}
               >
                 <Card
-                  className={`${getMessageStyle(message.type)} backdrop-blur-sm`}
+                  className={`${getMessageStyle(message.type)} backdrop-blur-sm overflow-hidden`}
                 >
-                  <CardContent className="p-3 sm:p-4">
-                    <div className="text-xs sm:text-sm whitespace-pre-wrap break-words leading-relaxed">
+                  <CardContent className="p-3 sm:p-4 min-w-0">
+                    <div className="text-xs sm:text-sm whitespace-pre-wrap break-words leading-relaxed overflow-wrap-anywhere">
                       {message.content}
                     </div>
                     <div className="text-xs opacity-70 mt-2 text-purple-200">
