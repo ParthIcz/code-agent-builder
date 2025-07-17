@@ -71,7 +71,7 @@ const Index = () => {
       <div className="absolute bottom-20 right-10 w-96 h-96 premium-gradient rounded-full opacity-8 blur-3xl animate-pulse delay-1000" />
 
       {/* Header */}
-      <header className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-md">
+      <header className="relative z-[200] border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
           <div className="flex items-center justify-between min-h-[60px]">
             {/* Logo and Brand */}
