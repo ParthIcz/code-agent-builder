@@ -133,7 +133,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden relative flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background overflow-hidden relative flex items-center justify-center p-2 sm:p-4">
       {/* Premium Background */}
       <div className="absolute inset-0 hero-gradient opacity-30" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
