@@ -148,14 +148,15 @@ const SignUp = () => {
         variant="ghost"
         size="sm"
         onClick={() => navigate("/")}
-        className="absolute top-6 left-6 text-gray-300 hover:text-white border-white/20 hover:border-white/40 z-20"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 text-gray-300 hover:text-white border-white/20 hover:border-white/40 z-20"
       >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Home
+        <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+        <span className="hidden xs:inline">Back to Home</span>
+        <span className="xs:hidden">Back</span>
       </Button>
 
       {/* Main Content */}
-      <div className="relative z-10 w-full max-w-lg">
+      <div className="relative z-10 w-full max-w-lg mx-auto px-2 sm:px-0">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-6">
