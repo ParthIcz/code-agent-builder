@@ -183,12 +183,12 @@ export default function Editor() {
       <div className="absolute inset-0 luxury-gradient opacity-10 pointer-events-none" />
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 relative z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5 relative z-10">
+          <div className="flex items-center justify-between min-h-[60px]">
+            <div className="flex items-center gap-3 sm:gap-4">
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={() => {
                   try {
                     navigate("/");
@@ -196,35 +196,22 @@ export default function Editor() {
                     window.location.href = "/";
                   }
                 }}
-                className="lg:hidden h-8 w-8 sm:h-10 sm:w-10"
+                className="flex items-center gap-2 text-purple-200 hover:text-white hover:expensive-gradient px-3 py-2 h-auto"
               >
                 <Home className="h-4 w-4" />
+                <span className="hidden sm:inline">Home</span>
               </Button>
 
-              <div className="hidden lg:flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    try {
-                      navigate("/");
-                    } catch (error) {
-                      window.location.href = "/";
-                    }
-                  }}
-                  className="gap-2 text-purple-200 hover:text-white hover:expensive-gradient"
-                >
-                  <Home className="h-4 w-4" />
-                  Home
-                </Button>
-                <div className="w-px h-4 bg-border" />
-              </div>
+              <div className="w-px h-6 bg-border hidden sm:block" />
 
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-2xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
                 AI Code Builder
               </h1>
-              <div className="hidden md:block text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground hidden lg:block">
                 Build with AI • Edit • Preview
+              </div>
+              <div className="text-sm text-muted-foreground lg:hidden">
+                AI Editor
               </div>
             </div>
 
