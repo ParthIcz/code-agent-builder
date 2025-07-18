@@ -50,8 +50,8 @@ export function ChatAgent({
       const projectRequest: ProjectGenerationRequest = {
         description: message,
         projectType: detectProjectType(message),
-        framework: "React/Next.js",
-        styling: "Tailwind CSS",
+        framework: "HTML/CSS/JS",
+        styling: "CSS3",
         features: extractFeatures(message),
       };
 
