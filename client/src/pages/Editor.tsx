@@ -306,7 +306,7 @@ export default function Editor() {
       </header>
 
       {/* Main Layout */}
-      <div className="h-[calc(100vh-73px)] relative z-10">
+      <div className="h-[calc(100vh-60px)] sm:h-[calc(100vh-65px)] lg:h-[calc(100vh-73px)] relative z-10">
         {/* Desktop: Resizable Panels */}
         <div className="hidden lg:block h-full">
           <ResizablePanelGroup
