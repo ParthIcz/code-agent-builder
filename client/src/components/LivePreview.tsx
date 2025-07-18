@@ -32,14 +32,30 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [useExternalPreview, setUseExternalPreview] = useState(false);
   const [viewportSize, setViewportSize] = useState<
     "mobile" | "tablet" | "desktop"
   >("desktop");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Generate preview content with debouncing for smooth updates
+  // Check if we have a preview URL from the improved API
   useEffect(() => {
+    if (previewUrl && previewUrl.startsWith('http://localhost:')) {
+      setUseExternalPreview(true);
+      setIsLoading(false);
+      setHasError(false);
+      console.log("✅ Using external preview server:", previewUrl);
+    } else {
+      setUseExternalPreview(false);
+      console.log("📝 Using embedded preview generation");
+    }
+  }, [previewUrl]);
+
+  // Generate preview content with debouncing for smooth updates (only for embedded preview)
+  useEffect(() => {
+    if (useExternalPreview) return; // Skip if using external preview
+    
     // Clear existing timeout
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
@@ -74,7 +90,7 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
         clearTimeout(updateTimeoutRef.current);
       }
     };
-  }, [files]);
+  }, [files, useExternalPreview]);
 
   const generatePreviewHTML = (files: Record<string, ProjectFile>): string => {
     // If no files are generated yet, show empty state
