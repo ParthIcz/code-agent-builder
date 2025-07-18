@@ -59,7 +59,16 @@ export function ChatAgent({
 
       try {
         // Try backend API first
-        const backendUrl = "http://localhost:8082/api/generate-project";
+        // Detect environment and use appropriate backend URL
+        const isProduction = window.location.hostname !== "localhost";
+        const backendUrl = isProduction
+          ? "/api/generate-project" // Use relative URL in production
+          : "http://localhost:8082/api/generate-project"; // Use localhost in development
+
+        console.log(
+          "Environment:",
+          isProduction ? "production" : "development",
+        );
         console.log("Attempting to call backend API at:", backendUrl);
         console.log("Request payload:", projectRequest);
         const response = await fetch(
