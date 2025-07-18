@@ -59,7 +59,9 @@ export function ChatAgent({
 
       try {
         // Try backend API first
-        console.log("Attempting to call backend API...");
+        const backendUrl = "http://localhost:8082/api/generate-project";
+        console.log("Attempting to call backend API at:", backendUrl);
+        console.log("Request payload:", projectRequest);
         const response = await fetch(
           "http://localhost:8082/api/generate-project",
           {
