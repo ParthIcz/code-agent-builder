@@ -23,6 +23,53 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Backend server is running!" });
 });
 
+// Serve preview files
+app.get("/api/preview/:projectId/*", (req, res) => {
+  const projectId = req.params.projectId;
+  const filePath = req.params[0] || "index.html";
+  const projectDir = path.join(__dirname, "temp_build", `project_${projectId}`);
+  const fullPath = path.join(projectDir, filePath);
+
+  if (fs.existsSync(fullPath)) {
+    res.sendFile(fullPath);
+  } else {
+    res.status(404).send("File not found");
+  }
+});
+
+// Get project files list
+app.get("/api/project/:projectId/files", (req, res) => {
+  const projectId = req.params.projectId;
+  const projectDir = path.join(__dirname, "temp_build", `project_${projectId}`);
+
+  if (!fs.existsSync(projectDir)) {
+    return res.status(404).json({ error: "Project not found" });
+  }
+
+  const files = {};
+  const readFilesRecursively = (dir, relativePath = "") => {
+    const items = fs.readdirSync(dir);
+    items.forEach((item) => {
+      const itemPath = path.join(dir, item);
+      const relativeItemPath = path.join(relativePath, item);
+
+      if (fs.statSync(itemPath).isDirectory()) {
+        readFilesRecursively(itemPath, relativeItemPath);
+      } else {
+        const content = fs.readFileSync(itemPath, "utf-8");
+        const ext = path.extname(item).substring(1);
+        files[relativeItemPath] = {
+          content,
+          type: ext,
+        };
+      }
+    });
+  };
+
+  readFilesRecursively(projectDir);
+  res.json({ files });
+});
+
 app.post("/api/generate-project", async (req, res) => {
   console.log("Received project request:", req.body);
   const projectRequest = req.body;
