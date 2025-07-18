@@ -57,7 +57,7 @@ export function ChatAgent({
 
       // Call backend API instead of Gemini directly
       const response = await fetch(
-        "http://localhost:8081/api/generate-project",
+        "http://localhost:8082/api/generate-project",
         {
           method: "POST",
           headers: {
