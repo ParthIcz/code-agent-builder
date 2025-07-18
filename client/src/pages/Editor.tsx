@@ -186,9 +186,9 @@ export default function Editor() {
       <div className="absolute inset-0 luxury-gradient opacity-10 pointer-events-none" />
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 relative z-10">
+        <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3 relative z-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <Button
                 variant="ghost"
                 size="icon"
@@ -199,7 +199,7 @@ export default function Editor() {
                     window.location.href = "/";
                   }
                 }}
-                className="lg:hidden"
+                className="lg:hidden shrink-0"
               >
                 <Home className="h-4 w-4" />
               </Button>
@@ -223,47 +223,53 @@ export default function Editor() {
                 <div className="w-px h-4 bg-border" />
               </div>
 
-              <h1 className="text-xl lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent">
-                Gemini Code Builder
-              </h1>
-              <div className="hidden sm:block text-sm text-muted-foreground">
-                Build with Gemini AI • Edit • Preview
+              <div className="min-w-0 flex-1">
+                <h1 className="text-base sm:text-lg lg:text-2xl font-bold glow-gradient bg-clip-text text-transparent truncate">
+                  <span className="hidden sm:inline">Gemini Code Builder</span>
+                  <span className="sm:hidden">Gemini</span>
+                </h1>
+                <div className="hidden md:block text-xs lg:text-sm text-muted-foreground truncate">
+                  Build with Gemini AI • Edit • Preview
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               {/* Mobile Navigation */}
-              <div className="flex lg:hidden">
+              <div className="flex lg:hidden bg-muted/20 rounded-md p-1">
                 <Button
                   variant={activePanel === "chat" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("chat")}
+                  className="h-8 w-8 p-0"
                 >
-                  <MessageSquare className="h-4 w-4" />
+                  <MessageSquare className="h-3.5 w-3.5" />
                 </Button>
                 <Button
                   variant={activePanel === "code" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("code")}
+                  className="h-8 w-8 p-0"
                 >
-                  <Code className="h-4 w-4" />
+                  <Code className="h-3.5 w-3.5" />
                 </Button>
                 <Button
                   variant={activePanel === "preview" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActivePanel("preview")}
+                  className="h-8 w-8 p-0"
                 >
-                  <Eye className="h-4 w-4" />
+                  <Eye className="h-3.5 w-3.5" />
                 </Button>
               </div>
 
               <div className="w-px h-4 bg-border hidden sm:block" />
 
-              <Button variant="outline" size="sm" onClick={toggleTheme}>
+              <Button variant="outline" size="sm" onClick={toggleTheme} className="h-8 w-8 p-0">
                 {theme === "dark" ? (
-                  <Sun className="h-4 w-4" />
+                  <Sun className="h-3.5 w-3.5" />
                 ) : (
-                  <Moon className="h-4 w-4" />
+                  <Moon className="h-3.5 w-3.5" />
                 )}
               </Button>
 
@@ -271,17 +277,17 @@ export default function Editor() {
                 variant="outline"
                 size="sm"
                 onClick={handleDownload}
-                className="hidden sm:flex"
+                className="hidden sm:flex h-8"
               >
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-3.5 w-3.5 mr-2" />
                 <span className="hidden md:inline">Download ZIP</span>
               </Button>
 
               {/* Mobile Chat Toggle */}
               <Sheet open={chatOpen} onOpenChange={setChatOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="lg:hidden">
-                    <Menu className="h-4 w-4" />
+                  <Button variant="outline" size="sm" className="lg:hidden h-8 w-8 p-0">
+                    <Menu className="h-3.5 w-3.5" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-80 p-0">
