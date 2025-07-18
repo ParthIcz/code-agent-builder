@@ -26,7 +26,10 @@ interface ChatAgentProps {
   messages: ChatMessage[];
   onSubmit: (message: string) => void;
   isGenerating: boolean;
-  onProjectGenerated?: (files: Record<string, ProjectFile>, previewUrl?: string) => void;
+  onProjectGenerated?: (
+    files: Record<string, ProjectFile>,
+    previewUrl?: string,
+  ) => void;
 }
 
 export function ChatAgent({
@@ -51,15 +54,18 @@ export function ChatAgent({
         styling: "Tailwind CSS",
         features: extractFeatures(message),
       };
-      
+
       // Call backend API instead of Gemini directly
-      const response = await fetch('http://localhost:8081/api/generate-project', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        "http://localhost:8081/api/generate-project",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(projectRequest),
         },
-        body: JSON.stringify(projectRequest),
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Server error: ${response.statusText}`);
