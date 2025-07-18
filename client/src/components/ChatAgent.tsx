@@ -71,16 +71,13 @@ export function ChatAgent({
         );
         console.log("Attempting to call backend API at:", backendUrl);
         console.log("Request payload:", projectRequest);
-        const response = await fetch(
-          "http://localhost:8082/api/generate-project",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(projectRequest),
+        const response = await fetch(backendUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify(projectRequest),
+        });
 
         if (!response.ok) {
           throw new Error(`Server error: ${response.statusText}`);
@@ -147,7 +144,7 @@ export function ChatAgent({
         }
       }
 
-      return `❌ Failed to generate project: ${errorMessage}\n\nTip: Try a simpler request or check your API configuration.`;
+      return `��� Failed to generate project: ${errorMessage}\n\nTip: Try a simpler request or check your API configuration.`;
     } finally {
       setIsAIGenerating(false);
     }
