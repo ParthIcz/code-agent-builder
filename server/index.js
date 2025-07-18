@@ -14,9 +14,21 @@ let previewServerStarted = false;
 let previewPort = 5005;
 let previewServer = null;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Middleware with enhanced CORS configuration
+app.use(
+  cors({
+    origin: [
+      "http://localhost:8080",
+      "http://localhost:3000",
+      "https://*.fly.dev",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Health check route
 app.get("/api/health", (req, res) => {
