@@ -25,34 +25,88 @@ app.post('/api/generate-project', async (req, res) => {
   console.log("Received project request:", req.body);
   const projectRequest = req.body;
 
-  const prompt = `You are an expert web developer. Generate a complete, production-ready website project based on the user's requirements.
+  const prompt = `You are an expert full-stack web developer with 15+ years of experience. Generate a complete, production-ready website project that is 100% error-free and fully functional.
 
-IMPORTANT: Return ONLY a valid JSON object with this exact structure:
+CRITICAL REQUIREMENTS:
+1. Return ONLY a valid JSON object with this EXACT structure (no markdown, no explanations):
 {
-  "name": "project-name",
-  "description": "brief description",
+  "name": "project-name-kebab-case",
+  "description": "brief description of the project",
   "files": {
-    "filename.ext": {
-      "content": "complete file content",
-      "type": "file extension"
+    "index.html": {
+      "content": "complete HTML content",
+      "type": "html"
+    },
+    "css/style.css": {
+      "content": "complete CSS content",
+      "type": "css"
+    },
+    "js/script.js": {
+      "content": "complete JavaScript content",
+      "type": "js"
     }
   }
 }
 
-Requirements:
-- Use plain HTML, CSS, and JavaScript files (.html, .css, .js)
-- All code must be complete and functional
-- Include a complete index.html as the main entry point
-- Include all necessary CSS and JS files
-- Make the website responsive and accessible
-- Use modern best practices for HTML, CSS, and JavaScript
-- Include proper file structure and organization
+2. CODE QUALITY REQUIREMENTS:
+- Write ONLY HTML, CSS, and JavaScript (no frameworks or libraries)
+- ALL code must be syntactically correct and error-free
+- Include complete DOCTYPE and proper HTML5 structure
+- Use semantic HTML tags (header, nav, main, section, article, footer)
+- Include proper meta tags for viewport, charset, and SEO
+- CSS must be well-organized with proper selectors and no syntax errors
+- JavaScript must be vanilla JS with proper error handling
+- Include proper CSS reset/normalize
+- Make website 100% responsive using CSS Grid and Flexbox
+- Include hover effects, transitions, and animations
+- Add proper accessibility (ARIA labels, alt texts, semantic markup)
+- Include favicon and proper meta tags
 
-Generate a website project with the following requirements:
+3. FOLDER STRUCTURE:
+- index.html (main entry point)
+- css/style.css (all styles)
+- js/script.js (all JavaScript)
+- images/ folder if needed (use placeholder images or CSS for graphics)
 
+4. FUNCTIONALITY REQUIREMENTS:
+- Website must be fully interactive and functional
+- Include smooth scrolling and navigation
+- Add form validation if forms exist
+- Include responsive navigation menu
+- Add loading states and error handling
+- Include proper event listeners
+- Test all interactive elements work correctly
+
+5. DESIGN REQUIREMENTS:
+- Modern, professional design with good typography
+- Consistent color scheme and spacing
+- Mobile-first responsive design
+- Beautiful animations and transitions
+- Proper contrast ratios for accessibility
+- Clean, organized layout with proper whitespace
+
+6. SPECIFIC FEATURES TO INCLUDE:
+- Responsive navigation menu (hamburger menu on mobile)
+- Hero section with compelling content
+- Feature sections with proper layout
+- Contact form with validation (if applicable)
+- Footer with proper links and information
+- Smooth scroll behavior
+- CSS animations and transitions
+- Mobile-optimized touch interactions
+
+PROJECT REQUIREMENTS:
 Description: ${projectRequest.description}
 
-Return ONLY the JSON object, no additional text or formatting.`;
+IMPORTANT: Generate code that is:
+- 100% error-free and syntactically correct
+- Fully functional with no broken features
+- Responsive across all device sizes
+- Professional and modern in appearance
+- Optimized for performance
+- Accessible and SEO-friendly
+
+Return ONLY the JSON object with no additional text, markdown formatting, or explanations.`;
 
   try {
     const GEMINI_API_URL =
@@ -63,15 +117,17 @@ Return ONLY the JSON object, no additional text or formatting.`;
       return res.status(500).json({ error: "Missing Gemini API key" });
     }
 
+    console.log("🤖 Sending request to Gemini API...");
+    
     const geminiRes = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.3, // Lower temperature for more consistent code generation
           topK: 1,
-          topP: 1,
+          topP: 0.8,
           maxOutputTokens: 8192,
         },
         safetySettings: [
@@ -84,60 +140,177 @@ Return ONLY the JSON object, no additional text or formatting.`;
     });
 
     if (!geminiRes.ok) {
-      const error = await geminiRes.text();
-      return res.status(500).json({ error });
+      const errorText = await geminiRes.text();
+      console.error("❌ Gemini API error:", errorText);
+      return res.status(500).json({ error: "Failed to generate project from Gemini API" });
     }
 
     const geminiData = await geminiRes.json();
-    const responseText =
-      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    console.log("Raw response from Gemini API:", responseText);
+    console.log("📝 Raw Gemini response length:", responseText.length);
+    console.log("📝 First 200 chars:", responseText.substring(0, 200));
 
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    // Enhanced JSON extraction with better error handling
+    let jsonMatch;
+    
+    // Try multiple extraction patterns
+    const patterns = [
+      /\{[\s\S]*\}/,           // Standard JSON pattern
+      /```json\s*([\s\S]*?)\s*```/,  // JSON in code blocks
+      /```\s*([\s\S]*?)\s*```/,      // Any code block
+    ];
+    
+    for (const pattern of patterns) {
+      jsonMatch = responseText.match(pattern);
+      if (jsonMatch) {
+        responseText = jsonMatch[1] || jsonMatch[0];
+        break;
+      }
+    }
+
     if (!jsonMatch) {
-      return res.status(500).json({ error: "Invalid response format from Gemini API" });
+      console.error("❌ No JSON found in response");
+      return res.status(500).json({ error: "Invalid response format from Gemini API - no JSON found" });
     }
 
     let projectData;
     try {
-      projectData = JSON.parse(jsonMatch[0]);
+      projectData = JSON.parse(responseText);
+      console.log("✅ Successfully parsed project data");
+      console.log("📁 Project name:", projectData.name);
+      console.log("📄 Files generated:", Object.keys(projectData.files || {}).length);
     } catch (parseError) {
-      console.error("JSON parsing error:", parseError);
+      console.error("❌ JSON parsing error:", parseError);
+      console.error("❌ Problematic JSON:", responseText.substring(0, 500));
       return res.status(500).json({ error: "Failed to parse JSON response from Gemini API" });
     }
 
-    const tempDir = path.join(__dirname, 'temp_build');
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    // Validate project structure
+    if (!projectData.name || !projectData.files || typeof projectData.files !== 'object') {
+      console.error("❌ Invalid project structure:", projectData);
+      return res.status(500).json({ error: "Invalid project structure from Gemini API" });
+    }
 
-    fs.readdirSync(tempDir).forEach(f => {
-      fs.rmSync(path.join(tempDir, f), { recursive: true, force: true });
-    });
+    // Create project directory
+    const projectDir = path.join(__dirname, 'projects', projectData.name.replace(/[^a-zA-Z0-9-_]/g, ''));
+    
+    // Clean up existing project directory
+    if (fs.existsSync(projectDir)) {
+      fs.rmSync(projectDir, { recursive: true, force: true });
+    }
+    
+    // Create new project directory
+    fs.mkdirSync(projectDir, { recursive: true });
+    console.log("📁 Created project directory:", projectDir);
 
+    // Create all project files with proper folder structure
+    const createdFiles = [];
     for (const [filename, fileData] of Object.entries(projectData.files)) {
-      const filePath = path.join(tempDir, filename);
-      const dir = path.dirname(filePath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(filePath, fileData.content, 'utf-8');
+      try {
+        const filePath = path.join(projectDir, filename);
+        const dir = path.dirname(filePath);
+        
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        
+        // Write file content
+        fs.writeFileSync(filePath, fileData.content, 'utf-8');
+        createdFiles.push(filename);
+        console.log("📄 Created file:", filename);
+      } catch (fileError) {
+        console.error(`❌ Error creating file ${filename}:`, fileError);
+      }
     }
 
-    if (!previewServerStarted) {
-      const expressStatic = express();
-      expressStatic.use(express.static(tempDir));
-      expressStatic.listen(previewPort, () => {
-        console.log(`Preview server running at http://localhost:${previewPort}`);
-      });
-      previewServerStarted = true;
-    }
-
-    res.json({
-      ...projectData,
-      previewUrl: `http://localhost:${previewPort}/index.html`
+    // Start preview server for this specific project
+    const uniquePort = 5000 + Math.floor(Math.random() * 1000);
+    
+    const previewServer = express();
+    previewServer.use(express.static(projectDir));
+    
+    // Add CORS headers for better compatibility
+    previewServer.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+      next();
     });
+    
+    // Handle SPA routing - serve index.html for any route that doesn't match a file
+    previewServer.get('*', (req, res) => {
+      const indexPath = path.join(projectDir, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send('Project not found');
+      }
+    });
+    
+    const server = previewServer.listen(uniquePort, () => {
+      console.log(`🚀 Preview server running at http://localhost:${uniquePort}`);
+    });
+
+    // Store server reference for cleanup
+    if (!global.previewServers) {
+      global.previewServers = new Map();
+    }
+    global.previewServers.set(projectData.name, server);
+
+    const response = {
+      ...projectData,
+      previewUrl: `http://localhost:${uniquePort}`,
+      port: uniquePort,
+      filesCreated: createdFiles,
+      projectPath: projectDir,
+      status: 'success'
+    };
+
+    console.log("✅ Project generation completed successfully");
+    res.json(response);
 
   } catch (err) {
-    console.error("Error in /api/generate-project:", err);
-    res.status(500).json({ error: err.message || "Unknown error" });
+    console.error("❌ Error in /api/generate-project:", err);
+    res.status(500).json({ error: err.message || "Unknown error occurred" });
+  }
+});
+
+// Clean up old preview servers
+app.post('/api/cleanup-previews', (req, res) => {
+  try {
+    if (global.previewServers) {
+      for (const [projectName, server] of global.previewServers.entries()) {
+        server.close();
+        console.log(`🧹 Cleaned up preview server for: ${projectName}`);
+      }
+      global.previewServers.clear();
+    }
+    res.json({ message: 'Preview servers cleaned up successfully' });
+  } catch (error) {
+    console.error('❌ Error cleaning up preview servers:', error);
+    res.status(500).json({ error: 'Failed to cleanup preview servers' });
+  }
+});
+
+// Get project status
+app.get('/api/project-status/:projectName', (req, res) => {
+  const projectName = req.params.projectName;
+  const projectDir = path.join(__dirname, 'projects', projectName.replace(/[^a-zA-Z0-9-_]/g, ''));
+  
+  if (fs.existsSync(projectDir)) {
+    const files = fs.readdirSync(projectDir, { recursive: true });
+    const hasPreviewServer = global.previewServers && global.previewServers.has(projectName);
+    
+    res.json({
+      exists: true,
+      files: files.length,
+      hasPreviewServer,
+      projectPath: projectDir
+    });
+  } else {
+    res.json({ exists: false });
   }
 });
 
