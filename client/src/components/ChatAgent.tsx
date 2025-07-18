@@ -55,23 +55,46 @@ export function ChatAgent({
         features: extractFeatures(message),
       };
 
-      // Call backend API instead of Gemini directly
-      const response = await fetch(
-        "http://localhost:8082/api/generate-project",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      let generatedProject;
+
+      try {
+        // Try backend API first
+        console.log("Attempting to call backend API...");
+        const response = await fetch(
+          "http://localhost:8082/api/generate-project",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(projectRequest),
           },
-          body: JSON.stringify(projectRequest),
-        },
-      );
+        );
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.statusText}`);
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.statusText}`);
+        }
+
+        generatedProject = await response.json();
+        console.log("Backend API call successful");
+      } catch (backendError) {
+        console.warn(
+          "Backend API failed, falling back to direct Gemini API:",
+          backendError,
+        );
+
+        // Update project request for direct Gemini API
+        const directProjectRequest = {
+          ...projectRequest,
+          framework: "HTML/CSS/JS",
+          styling: "CSS3",
+        };
+
+        // Fallback to direct Gemini API call
+        generatedProject =
+          await geminiService.generateProject(directProjectRequest);
+        console.log("Direct Gemini API call successful");
       }
-
-      const generatedProject = await response.json();
 
       // Convert generated project to ProjectFile format
       const projectFiles: Record<string, ProjectFile> = {};
