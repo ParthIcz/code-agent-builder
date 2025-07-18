@@ -8,7 +8,7 @@ const path = require("path");
 const { exec } = require("child_process");
 
 const app = express();
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8082;
 
 let previewServerStarted = false;
 let previewPort = 5005;
