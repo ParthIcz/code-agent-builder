@@ -117,15 +117,17 @@ Return ONLY the JSON object with no additional text, markdown formatting, or exp
       return res.status(500).json({ error: "Missing Gemini API key" });
     }
 
+    console.log("🤖 Sending request to Gemini API...");
+    
     const geminiRes = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.3, // Lower temperature for more consistent code generation
           topK: 1,
-          topP: 1,
+          topP: 0.8,
           maxOutputTokens: 8192,
         },
         safetySettings: [
@@ -138,60 +140,140 @@ Return ONLY the JSON object with no additional text, markdown formatting, or exp
     });
 
     if (!geminiRes.ok) {
-      const error = await geminiRes.text();
-      return res.status(500).json({ error });
+      const errorText = await geminiRes.text();
+      console.error("❌ Gemini API error:", errorText);
+      return res.status(500).json({ error: "Failed to generate project from Gemini API" });
     }
 
     const geminiData = await geminiRes.json();
-    const responseText =
-      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    console.log("Raw response from Gemini API:", responseText);
+    console.log("📝 Raw Gemini response length:", responseText.length);
+    console.log("📝 First 200 chars:", responseText.substring(0, 200));
 
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    // Enhanced JSON extraction with better error handling
+    let jsonMatch;
+    
+    // Try multiple extraction patterns
+    const patterns = [
+      /\{[\s\S]*\}/,           // Standard JSON pattern
+      /```json\s*([\s\S]*?)\s*```/,  // JSON in code blocks
+      /```\s*([\s\S]*?)\s*```/,      // Any code block
+    ];
+    
+    for (const pattern of patterns) {
+      jsonMatch = responseText.match(pattern);
+      if (jsonMatch) {
+        responseText = jsonMatch[1] || jsonMatch[0];
+        break;
+      }
+    }
+
     if (!jsonMatch) {
-      return res.status(500).json({ error: "Invalid response format from Gemini API" });
+      console.error("❌ No JSON found in response");
+      return res.status(500).json({ error: "Invalid response format from Gemini API - no JSON found" });
     }
 
     let projectData;
     try {
-      projectData = JSON.parse(jsonMatch[0]);
+      projectData = JSON.parse(responseText);
+      console.log("✅ Successfully parsed project data");
+      console.log("📁 Project name:", projectData.name);
+      console.log("📄 Files generated:", Object.keys(projectData.files || {}).length);
     } catch (parseError) {
-      console.error("JSON parsing error:", parseError);
+      console.error("❌ JSON parsing error:", parseError);
+      console.error("❌ Problematic JSON:", responseText.substring(0, 500));
       return res.status(500).json({ error: "Failed to parse JSON response from Gemini API" });
     }
 
-    const tempDir = path.join(__dirname, 'temp_build');
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    // Validate project structure
+    if (!projectData.name || !projectData.files || typeof projectData.files !== 'object') {
+      console.error("❌ Invalid project structure:", projectData);
+      return res.status(500).json({ error: "Invalid project structure from Gemini API" });
+    }
 
-    fs.readdirSync(tempDir).forEach(f => {
-      fs.rmSync(path.join(tempDir, f), { recursive: true, force: true });
-    });
+    // Create project directory
+    const projectDir = path.join(__dirname, 'projects', projectData.name.replace(/[^a-zA-Z0-9-_]/g, ''));
+    
+    // Clean up existing project directory
+    if (fs.existsSync(projectDir)) {
+      fs.rmSync(projectDir, { recursive: true, force: true });
+    }
+    
+    // Create new project directory
+    fs.mkdirSync(projectDir, { recursive: true });
+    console.log("📁 Created project directory:", projectDir);
 
+    // Create all project files with proper folder structure
+    const createdFiles = [];
     for (const [filename, fileData] of Object.entries(projectData.files)) {
-      const filePath = path.join(tempDir, filename);
-      const dir = path.dirname(filePath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(filePath, fileData.content, 'utf-8');
+      try {
+        const filePath = path.join(projectDir, filename);
+        const dir = path.dirname(filePath);
+        
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        
+        // Write file content
+        fs.writeFileSync(filePath, fileData.content, 'utf-8');
+        createdFiles.push(filename);
+        console.log("📄 Created file:", filename);
+      } catch (fileError) {
+        console.error(`❌ Error creating file ${filename}:`, fileError);
+      }
     }
 
-    if (!previewServerStarted) {
-      const expressStatic = express();
-      expressStatic.use(express.static(tempDir));
-      expressStatic.listen(previewPort, () => {
-        console.log(`Preview server running at http://localhost:${previewPort}`);
-      });
-      previewServerStarted = true;
-    }
-
-    res.json({
-      ...projectData,
-      previewUrl: `http://localhost:${previewPort}/index.html`
+    // Start preview server for this specific project
+    const uniquePort = 5000 + Math.floor(Math.random() * 1000);
+    
+    const previewServer = express();
+    previewServer.use(express.static(projectDir));
+    
+    // Add CORS headers for better compatibility
+    previewServer.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+      next();
     });
+    
+    // Handle SPA routing - serve index.html for any route that doesn't match a file
+    previewServer.get('*', (req, res) => {
+      const indexPath = path.join(projectDir, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send('Project not found');
+      }
+    });
+    
+    const server = previewServer.listen(uniquePort, () => {
+      console.log(`🚀 Preview server running at http://localhost:${uniquePort}`);
+    });
+
+    // Store server reference for cleanup
+    if (!global.previewServers) {
+      global.previewServers = new Map();
+    }
+    global.previewServers.set(projectData.name, server);
+
+    const response = {
+      ...projectData,
+      previewUrl: `http://localhost:${uniquePort}`,
+      port: uniquePort,
+      filesCreated: createdFiles,
+      projectPath: projectDir,
+      status: 'success'
+    };
+
+    console.log("✅ Project generation completed successfully");
+    res.json(response);
 
   } catch (err) {
-    console.error("Error in /api/generate-project:", err);
-    res.status(500).json({ error: err.message || "Unknown error" });
+    console.error("❌ Error in /api/generate-project:", err);
+    res.status(500).json({ error: err.message || "Unknown error occurred" });
   }
 });
 
