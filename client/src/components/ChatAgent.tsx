@@ -51,16 +51,30 @@ export function ChatAgent({
         styling: "Tailwind CSS",
         features: extractFeatures(message),
       };
+      
+      // Call backend API instead of Gemini directly
+      const response = await fetch('http://localhost:3001/api/generate-project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectRequest),
+      });
 
-      const generatedProject =
-        await geminiService.generateProject(projectRequest);
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.statusText}`);
+      }
+
+      const generatedProject = await response.json();
 
       // Convert generated project to ProjectFile format
       const projectFiles: Record<string, ProjectFile> = {};
       Object.entries(generatedProject.files).forEach(([filename, fileData]) => {
+        // Type assertion to ensure fileData has content and type
+        const typedFileData = fileData as { content: string; type: string };
         projectFiles[filename] = {
-          content: fileData.content,
-          type: fileData.type,
+          content: typedFileData.content,
+          type: typedFileData.type,
         };
       });
 
