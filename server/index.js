@@ -8,10 +8,11 @@ const path = require("path");
 const { exec } = require("child_process");
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8081;
 
 let previewServerStarted = false;
-let previewPort = 5005; // You can randomize or increment if needed
+let previewPort = 5005;
+let previewServer = null;
 
 // Middleware
 app.use(cors());
@@ -153,13 +154,33 @@ Return ONLY the JSON object, no additional text or formatting.`;
         .json({ error: "Failed to parse JSON response from Gemini API" });
     }
 
-    const tempDir = path.join(__dirname, "temp_build");
+    // Create temp directory with timestamp to avoid conflicts
+    const timestamp = Date.now();
+    const tempDir = path.join(__dirname, "temp_build", `project_${timestamp}`);
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-    fs.readdirSync(tempDir).forEach((f) => {
-      fs.rmSync(path.join(tempDir, f), { recursive: true, force: true });
-    });
+    // Clean up old project directories (keep only last 5)
+    const tempBuildDir = path.join(__dirname, "temp_build");
+    if (fs.existsSync(tempBuildDir)) {
+      const dirs = fs
+        .readdirSync(tempBuildDir)
+        .filter((d) => d.startsWith("project_"))
+        .sort((a, b) => {
+          const aTime = parseInt(a.replace("project_", ""));
+          const bTime = parseInt(b.replace("project_", ""));
+          return bTime - aTime;
+        });
 
+      // Keep only the 5 most recent directories
+      dirs.slice(5).forEach((dir) => {
+        fs.rmSync(path.join(tempBuildDir, dir), {
+          recursive: true,
+          force: true,
+        });
+      });
+    }
+
+    // Write project files
     for (const [filename, fileData] of Object.entries(projectData.files)) {
       const filePath = path.join(tempDir, filename);
       const dir = path.dirname(filePath);
@@ -167,20 +188,40 @@ Return ONLY the JSON object, no additional text or formatting.`;
       fs.writeFileSync(filePath, fileData.content, "utf-8");
     }
 
-    if (!previewServerStarted) {
-      const expressStatic = express();
-      expressStatic.use(express.static(tempDir));
-      expressStatic.listen(previewPort, () => {
-        console.log(
-          `Preview server running at http://localhost:${previewPort}`,
-        );
+    console.log(`Created project files in: ${tempDir}`);
+    console.log(`Files created: ${Object.keys(projectData.files).join(", ")}`);
+
+    // Start or restart preview server
+    if (previewServer) {
+      previewServer.close(() => {
+        console.log("Previous preview server closed");
       });
-      previewServerStarted = true;
     }
+
+    const expressStatic = express();
+    expressStatic.use(cors());
+    expressStatic.use(express.static(tempDir));
+
+    // Handle SPA routing - serve index.html for all routes
+    expressStatic.get("*", (req, res) => {
+      const indexPath = path.join(tempDir, "index.html");
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send("Project not found");
+      }
+    });
+
+    previewServer = expressStatic.listen(previewPort, () => {
+      console.log(`Preview server running at http://localhost:${previewPort}`);
+      previewServerStarted = true;
+    });
 
     res.json({
       ...projectData,
-      previewUrl: `http://localhost:${previewPort}/index.html`,
+      previewUrl: `http://localhost:${previewPort}`,
+      projectPath: tempDir,
+      filesCreated: Object.keys(projectData.files).length,
     });
   } catch (err) {
     console.error("Error in /api/generate-project:", err);
