@@ -277,6 +277,43 @@ Return ONLY the JSON object with no additional text, markdown formatting, or exp
   }
 });
 
+// Clean up old preview servers
+app.post('/api/cleanup-previews', (req, res) => {
+  try {
+    if (global.previewServers) {
+      for (const [projectName, server] of global.previewServers.entries()) {
+        server.close();
+        console.log(`🧹 Cleaned up preview server for: ${projectName}`);
+      }
+      global.previewServers.clear();
+    }
+    res.json({ message: 'Preview servers cleaned up successfully' });
+  } catch (error) {
+    console.error('❌ Error cleaning up preview servers:', error);
+    res.status(500).json({ error: 'Failed to cleanup preview servers' });
+  }
+});
+
+// Get project status
+app.get('/api/project-status/:projectName', (req, res) => {
+  const projectName = req.params.projectName;
+  const projectDir = path.join(__dirname, 'projects', projectName.replace(/[^a-zA-Z0-9-_]/g, ''));
+  
+  if (fs.existsSync(projectDir)) {
+    const files = fs.readdirSync(projectDir, { recursive: true });
+    const hasPreviewServer = global.previewServers && global.previewServers.has(projectName);
+    
+    res.json({
+      exists: true,
+      files: files.length,
+      hasPreviewServer,
+      projectPath: projectDir
+    });
+  } else {
+    res.json({ exists: false });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
