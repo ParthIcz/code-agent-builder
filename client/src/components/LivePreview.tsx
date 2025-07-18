@@ -35,11 +35,29 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
   const [viewportSize, setViewportSize] = useState<
     "mobile" | "tablet" | "desktop"
   >("desktop");
+  const [useExternalPreview, setUseExternalPreview] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Check if external preview URL is available and valid
+  useEffect(() => {
+    if (previewUrl && previewUrl.startsWith("http")) {
+      setUseExternalPreview(true);
+      setIsLoading(false);
+      setHasError(false);
+      console.log("Using external preview URL:", previewUrl);
+    } else {
+      setUseExternalPreview(false);
+    }
+  }, [previewUrl]);
+
   // Generate preview content with debouncing for smooth updates
   useEffect(() => {
+    // If we have an external preview URL, don't generate content
+    if (useExternalPreview) {
+      return;
+    }
+
     // Clear existing timeout
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
@@ -74,7 +92,7 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
         clearTimeout(updateTimeoutRef.current);
       }
     };
-  }, [files]);
+  }, [files, useExternalPreview]);
 
   const generatePreviewHTML = (files: Record<string, ProjectFile>): string => {
     // If no files are generated yet, show empty state
@@ -405,32 +423,36 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
     files: Record<string, ProjectFile>,
   ): string => {
     // Try to intelligently construct a preview from available files
-    const htmlFiles = Object.entries(files).filter(([path, file]) => 
-      file.type === 'html' || path.endsWith('.html')
+    const htmlFiles = Object.entries(files).filter(
+      ([path, file]) => file.type === "html" || path.endsWith(".html"),
     );
-    const cssFiles = Object.entries(files).filter(([path, file]) => 
-      file.type === 'css' || path.endsWith('.css')
+    const cssFiles = Object.entries(files).filter(
+      ([path, file]) => file.type === "css" || path.endsWith(".css"),
     );
-    const jsFiles = Object.entries(files).filter(([path, file]) => 
-      file.type === 'js' || path.endsWith('.js')
+    const jsFiles = Object.entries(files).filter(
+      ([path, file]) => file.type === "js" || path.endsWith(".js"),
     );
-    const reactFiles = Object.entries(files).filter(([path, file]) => 
-      file.type === 'tsx' || file.type === 'jsx' || path.endsWith('.tsx') || path.endsWith('.jsx')
+    const reactFiles = Object.entries(files).filter(
+      ([path, file]) =>
+        file.type === "tsx" ||
+        file.type === "jsx" ||
+        path.endsWith(".tsx") ||
+        path.endsWith(".jsx"),
     );
 
     // Collect all CSS content
-    let styles = '';
+    let styles = "";
     cssFiles.forEach(([, file]) => {
-      styles += file.content + '\n';
+      styles += file.content + "\n";
     });
 
     // Collect all JavaScript content
-    let scripts = '';
+    let scripts = "";
     jsFiles.forEach(([, file]) => {
-      scripts += file.content + '\n';
+      scripts += file.content + "\n";
     });
 
-    let bodyContent = '';
+    let bodyContent = "";
 
     // If we have React files, try to extract JSX content
     if (reactFiles.length > 0) {
@@ -524,40 +546,43 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
     // Take the first React file and try to extract renderable content
     const [, firstReactFile] = reactFiles[0];
     const content = firstReactFile.content;
-    
+
     // Look for JSX return statement
     const jsxMatch = content.match(/return\s*\(([\s\S]*?)\);?\s*\}/);
     if (jsxMatch) {
       return jsxMatch[1]
-        .replace(/className=/g, 'class=')
-        .replace(/htmlFor=/g, 'for=')
-        .replace(/{`([^`]*)`}/g, '$1')
+        .replace(/className=/g, "class=")
+        .replace(/htmlFor=/g, "for=")
+        .replace(/{`([^`]*)`}/g, "$1")
         .replace(/{([^}]*)}/g, (match, p1) => {
           // Handle simple string values and remove complex expressions
           if (p1.match(/^["'].*["']$/)) return p1.slice(1, -1);
           if (p1.match(/^\d+$/)) return p1;
-          return '';
+          return "";
         });
     }
-    
+
     // Fallback: look for JSX-like content in the file
     const jsxLikeContent = content.match(/<[^>]+>[\s\S]*<\/[^>]+>/);
     if (jsxLikeContent) {
       return jsxLikeContent[0]
-        .replace(/className=/g, 'class=')
-        .replace(/htmlFor=/g, 'for=');
+        .replace(/className=/g, "class=")
+        .replace(/htmlFor=/g, "for=");
     }
-    
+
     return generateSmartPreview({ [reactFiles[0][0]]: reactFiles[0][1] });
   };
 
   const generateSmartPreview = (files: Record<string, ProjectFile>): string => {
     const fileEntries = Object.entries(files);
-    
+
     // Try to detect what kind of app this might be based on content
-    const allContent = fileEntries.map(([, file]) => file.content).join(' ').toLowerCase();
-    
-    if (allContent.includes('todo') || allContent.includes('task')) {
+    const allContent = fileEntries
+      .map(([, file]) => file.content)
+      .join(" ")
+      .toLowerCase();
+
+    if (allContent.includes("todo") || allContent.includes("task")) {
       return `
         <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
           <div class="max-w-2xl mx-auto">
@@ -580,8 +605,12 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
           </div>
         </div>`;
     }
-    
-    if (allContent.includes('portfolio') || allContent.includes('about') || allContent.includes('contact')) {
+
+    if (
+      allContent.includes("portfolio") ||
+      allContent.includes("about") ||
+      allContent.includes("contact")
+    ) {
       return `
         <div class="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900">
           <nav class="p-6">
@@ -605,7 +634,7 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
           </div>
         </div>`;
     }
-    
+
     // Generic preview for other types of content
     return `
       <div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8">
@@ -621,17 +650,26 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
             <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <h3 class="text-2xl font-bold mb-4 text-blue-400">Generated Files</h3>
               <div class="space-y-3">
-                ${Object.keys(files).slice(0, 5).map(filename => `
+                ${Object.keys(files)
+                  .slice(0, 5)
+                  .map(
+                    (filename) => `
                   <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
                     <div class="w-3 h-3 bg-green-400 rounded-full"></div>
                     <span class="font-mono text-sm">${filename}</span>
                   </div>
-                `).join('')}
-                ${Object.keys(files).length > 5 ? `
+                `,
+                  )
+                  .join("")}
+                ${
+                  Object.keys(files).length > 5
+                    ? `
                   <div class="text-center text-gray-400 text-sm pt-2">
                     ... and ${Object.keys(files).length - 5} more files
                   </div>
-                ` : ''}
+                `
+                    : ""
+                }
               </div>
             </div>
             
@@ -699,9 +737,15 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
   };
 
   const handleOpenInNewTab = () => {
-    const blob = new Blob([previewContent], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
+    if (useExternalPreview && previewUrl) {
+      // Open the external preview URL
+      window.open(previewUrl, "_blank");
+    } else {
+      // Open the generated content in a new tab
+      const blob = new Blob([previewContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    }
   };
 
   const getViewportStyles = () => {
@@ -734,6 +778,11 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <h2 className="font-semibold text-base sm:text-lg truncate">
               Live Preview
+              {useExternalPreview && (
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  External
+                </Badge>
+              )}
             </h2>
             {isLoading && (
               <Badge
@@ -865,10 +914,11 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
             >
               <iframe
                 ref={iframeRef}
-                srcDoc={previewContent}
+                src={useExternalPreview ? previewUrl : undefined}
+                srcDoc={useExternalPreview ? undefined : previewContent}
                 className="w-full h-full border-0 bg-white"
                 title="Live Preview"
-                sandbox="allow-scripts allow-same-origin"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
               />
             </div>
           </div>
