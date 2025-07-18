@@ -48,6 +48,7 @@ export default function Editor() {
     "chat",
   );
   const [chatOpen, setChatOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
 
   // Panel size persistence
   const [panelSizes, setPanelSizes] = useState(() => {
@@ -70,8 +71,10 @@ export default function Editor() {
 
   const handleProjectGenerated = (
     generatedFiles: Record<string, ProjectFile>,
+    previewUrl?: string,
   ) => {
     setFiles(generatedFiles);
+    setPreviewUrl(previewUrl);
 
     // Select first file by default
     const firstFile = Object.keys(generatedFiles)[0];
@@ -350,7 +353,7 @@ export default function Editor() {
               minSize={20}
               maxSize={50}
             >
-              <LivePreview files={files} />
+              <LivePreview files={files} previewUrl={previewUrl} />
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
@@ -373,7 +376,9 @@ export default function Editor() {
               onFileUpdate={handleFileUpdate}
             />
           )}
-          {activePanel === "preview" && <LivePreview files={files} />}
+          {activePanel === "preview" && (
+            <LivePreview files={files} previewUrl={previewUrl} />
+          )}
         </div>
       </div>
 

@@ -26,7 +26,7 @@ interface ChatAgentProps {
   messages: ChatMessage[];
   onSubmit: (message: string) => void;
   isGenerating: boolean;
-  onProjectGenerated?: (files: Record<string, ProjectFile>) => void;
+  onProjectGenerated?: (files: Record<string, ProjectFile>, previewUrl?: string) => void;
 }
 
 export function ChatAgent({
@@ -53,7 +53,7 @@ export function ChatAgent({
       };
       
       // Call backend API instead of Gemini directly
-      const response = await fetch('http://localhost:3001/api/generate-project', {
+      const response = await fetch('http://localhost:8081/api/generate-project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,10 +80,11 @@ export function ChatAgent({
 
       // Notify parent component about the generated project
       if (onProjectGenerated) {
-        onProjectGenerated(projectFiles);
+        // Pass previewUrl if present
+        (onProjectGenerated as any)(projectFiles, generatedProject.previewUrl);
       }
 
-      return `✅ Successfully generated "${generatedProject.name}"!\n\n${generatedProject.description}\n\nGenerated ${Object.keys(projectFiles).length} files. You can now edit them in the code editor and see the live preview.`;
+      return `✅ Successfully generated "${generatedProject.name}"!\n\n${generatedProject.description}\n\nGenerated ${Object.keys(projectFiles).length} files. You can now edit them in the code editor and see the live preview.${generatedProject.previewUrl ? `\n\nPreview: ${generatedProject.previewUrl}` : ""}`;
     } catch (error) {
       console.error("AI Generation Error:", error);
       return `❌ Failed to generate project: ${error instanceof Error ? error.message : "Unknown error"}`;
@@ -150,12 +151,12 @@ export function ChatAgent({
   };
 
   const quickPrompts = [
-    "Create a modern portfolio website with React and Tailwind CSS",
-    "Build a todo app with TypeScript and local storage",
-    "Generate a landing page for a SaaS product",
-    "Create a dashboard with charts and data visualization",
-    "Build an e-commerce product catalog",
-    "Generate a blog website with markdown support",
+    "Create a modern portfolio website with HTML, CSS, and JavaScript",
+    "Build a todo app with HTML, CSS, and JavaScript",
+    "Generate a landing page for a SaaS product with HTML, CSS, and JavaScript",
+    "Create a dashboard with charts and data visualization using HTML, CSS, and JavaScript",
+    "Build an e-commerce product catalog with HTML, CSS, and JavaScript",
+    "Generate a blog website with markdown support using HTML, CSS, and JavaScript",
   ];
 
   const getMessageIcon = (type: ChatMessage["type"]) => {

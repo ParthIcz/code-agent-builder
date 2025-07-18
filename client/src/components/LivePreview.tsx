@@ -23,9 +23,10 @@ import type { ProjectFile } from "@/types";
 
 interface LivePreviewProps {
   files: Record<string, ProjectFile>;
+  previewUrl?: string;
 }
 
-export function LivePreview({ files }: LivePreviewProps) {
+export function LivePreview({ files, previewUrl }: LivePreviewProps) {
   const [previewContent, setPreviewContent] = useState<string>("");
   const [isVisible, setIsVisible] = useState(true);
   const [hasError, setHasError] = useState(false);

@@ -2,9 +2,15 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const fetch = (...args) => import('node-fetch').then(mod => mod.default(...args));
+const fs = require('fs');
+const path = require('path');
+const { exec } = require('child_process');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+let previewServerStarted = false;
+let previewPort = 5005; // You can randomize or increment if needed
 
 // Middleware
 app.use(cors());
@@ -18,8 +24,8 @@ app.get('/api/health', (req, res) => {
 app.post('/api/generate-project', async (req, res) => {
   console.log("Received project request:", req.body);
   const projectRequest = req.body;
-  // Build prompt for Gemini
-  const prompt = `You are an expert full-stack developer. Generate a complete, production-ready project based on the user's requirements.
+
+  const prompt = `You are an expert web developer. Generate a complete, production-ready website project based on the user's requirements.
 
 IMPORTANT: Return ONLY a valid JSON object with this exact structure:
 {
@@ -34,31 +40,17 @@ IMPORTANT: Return ONLY a valid JSON object with this exact structure:
 }
 
 Requirements:
-- Use modern React/Next.js with TypeScript
-- Include Tailwind CSS for styling
-- Use shadcn/ui components where appropriate
-- Include proper error handling and loading states
-- Make it responsive and accessible
-- Include proper imports and exports
-- Generate complete, working code (no placeholders or comments like "// TODO")
-- Include package.json with all required dependencies
-- Use modern ES6+ syntax and React best practices
+- Use plain HTML, CSS, and JavaScript files (.html, .css, .js)
+- All code must be complete and functional
+- Include a complete index.html as the main entry point
+- Include all necessary CSS and JS files
+- Make the website responsive and accessible
+- Use modern best practices for HTML, CSS, and JavaScript
+- Include proper file structure and organization
 
-Generate a ${projectRequest.projectType || "web application"} project with the following requirements:
+Generate a website project with the following requirements:
 
 Description: ${projectRequest.description}
-Framework: ${projectRequest.framework || "React/Next.js"}
-Styling: ${projectRequest.styling || "Tailwind CSS"}
-Features: ${projectRequest.features?.join(", ") || "Standard features"}
-
-Generate a complete project with all necessary files including:
-- Component files (.tsx)
-- Styling files (.css)
-- Configuration files (package.json, etc.)
-- Type definitions if needed
-- Proper file structure and organization
-
-Make sure all code is complete, functional, and follows modern best practices.
 
 Return ONLY the JSON object, no additional text or formatting.`;
 
@@ -93,22 +85,58 @@ Return ONLY the JSON object, no additional text or formatting.`;
 
     if (!geminiRes.ok) {
       const error = await geminiRes.text();
-      return res.status(500).json({ error: error });
+      return res.status(500).json({ error });
     }
 
     const geminiData = await geminiRes.json();
     const responseText =
       geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    // Extract JSON from Gemini response
+    console.log("Raw response from Gemini API:", responseText);
+
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return res.status(500).json({ error: "Invalid response format from Gemini API" });
     }
 
-    const projectData = JSON.parse(jsonMatch[0]);
-    res.json(projectData);
+    let projectData;
+    try {
+      projectData = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error("JSON parsing error:", parseError);
+      return res.status(500).json({ error: "Failed to parse JSON response from Gemini API" });
+    }
+
+    const tempDir = path.join(__dirname, 'temp_build');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+    fs.readdirSync(tempDir).forEach(f => {
+      fs.rmSync(path.join(tempDir, f), { recursive: true, force: true });
+    });
+
+    for (const [filename, fileData] of Object.entries(projectData.files)) {
+      const filePath = path.join(tempDir, filename);
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(filePath, fileData.content, 'utf-8');
+    }
+
+    if (!previewServerStarted) {
+      const expressStatic = express();
+      expressStatic.use(express.static(tempDir));
+      expressStatic.listen(previewPort, () => {
+        console.log(`Preview server running at http://localhost:${previewPort}`);
+      });
+      previewServerStarted = true;
+    }
+
+    res.json({
+      ...projectData,
+      previewUrl: `http://localhost:${previewPort}/index.html`
+    });
+
   } catch (err) {
+    console.error("Error in /api/generate-project:", err);
     res.status(500).json({ error: err.message || "Unknown error" });
   }
 });
