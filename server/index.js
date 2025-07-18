@@ -25,34 +25,88 @@ app.post('/api/generate-project', async (req, res) => {
   console.log("Received project request:", req.body);
   const projectRequest = req.body;
 
-  const prompt = `You are an expert web developer. Generate a complete, production-ready website project based on the user's requirements.
+  const prompt = `You are an expert full-stack web developer with 15+ years of experience. Generate a complete, production-ready website project that is 100% error-free and fully functional.
 
-IMPORTANT: Return ONLY a valid JSON object with this exact structure:
+CRITICAL REQUIREMENTS:
+1. Return ONLY a valid JSON object with this EXACT structure (no markdown, no explanations):
 {
-  "name": "project-name",
-  "description": "brief description",
+  "name": "project-name-kebab-case",
+  "description": "brief description of the project",
   "files": {
-    "filename.ext": {
-      "content": "complete file content",
-      "type": "file extension"
+    "index.html": {
+      "content": "complete HTML content",
+      "type": "html"
+    },
+    "css/style.css": {
+      "content": "complete CSS content",
+      "type": "css"
+    },
+    "js/script.js": {
+      "content": "complete JavaScript content",
+      "type": "js"
     }
   }
 }
 
-Requirements:
-- Use plain HTML, CSS, and JavaScript files (.html, .css, .js)
-- All code must be complete and functional
-- Include a complete index.html as the main entry point
-- Include all necessary CSS and JS files
-- Make the website responsive and accessible
-- Use modern best practices for HTML, CSS, and JavaScript
-- Include proper file structure and organization
+2. CODE QUALITY REQUIREMENTS:
+- Write ONLY HTML, CSS, and JavaScript (no frameworks or libraries)
+- ALL code must be syntactically correct and error-free
+- Include complete DOCTYPE and proper HTML5 structure
+- Use semantic HTML tags (header, nav, main, section, article, footer)
+- Include proper meta tags for viewport, charset, and SEO
+- CSS must be well-organized with proper selectors and no syntax errors
+- JavaScript must be vanilla JS with proper error handling
+- Include proper CSS reset/normalize
+- Make website 100% responsive using CSS Grid and Flexbox
+- Include hover effects, transitions, and animations
+- Add proper accessibility (ARIA labels, alt texts, semantic markup)
+- Include favicon and proper meta tags
 
-Generate a website project with the following requirements:
+3. FOLDER STRUCTURE:
+- index.html (main entry point)
+- css/style.css (all styles)
+- js/script.js (all JavaScript)
+- images/ folder if needed (use placeholder images or CSS for graphics)
 
+4. FUNCTIONALITY REQUIREMENTS:
+- Website must be fully interactive and functional
+- Include smooth scrolling and navigation
+- Add form validation if forms exist
+- Include responsive navigation menu
+- Add loading states and error handling
+- Include proper event listeners
+- Test all interactive elements work correctly
+
+5. DESIGN REQUIREMENTS:
+- Modern, professional design with good typography
+- Consistent color scheme and spacing
+- Mobile-first responsive design
+- Beautiful animations and transitions
+- Proper contrast ratios for accessibility
+- Clean, organized layout with proper whitespace
+
+6. SPECIFIC FEATURES TO INCLUDE:
+- Responsive navigation menu (hamburger menu on mobile)
+- Hero section with compelling content
+- Feature sections with proper layout
+- Contact form with validation (if applicable)
+- Footer with proper links and information
+- Smooth scroll behavior
+- CSS animations and transitions
+- Mobile-optimized touch interactions
+
+PROJECT REQUIREMENTS:
 Description: ${projectRequest.description}
 
-Return ONLY the JSON object, no additional text or formatting.`;
+IMPORTANT: Generate code that is:
+- 100% error-free and syntactically correct
+- Fully functional with no broken features
+- Responsive across all device sizes
+- Professional and modern in appearance
+- Optimized for performance
+- Accessible and SEO-friendly
+
+Return ONLY the JSON object with no additional text, markdown formatting, or explanations.`;
 
   try {
     const GEMINI_API_URL =
