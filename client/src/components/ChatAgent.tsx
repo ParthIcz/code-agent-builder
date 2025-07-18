@@ -116,7 +116,27 @@ export function ChatAgent({
       return `✅ Successfully generated "${generatedProject.name}"!\n\n${generatedProject.description}\n\nGenerated ${Object.keys(projectFiles).length} files. You can now edit them in the code editor and see the live preview.${generatedProject.previewUrl ? `\n\nPreview: ${generatedProject.previewUrl}` : ""}`;
     } catch (error) {
       console.error("AI Generation Error:", error);
-      return `❌ Failed to generate project: ${error instanceof Error ? error.message : "Unknown error"}`;
+
+      let errorMessage = "Unknown error occurred";
+      if (error instanceof Error) {
+        if (error.message.includes("Failed to fetch")) {
+          errorMessage =
+            "Network connection failed. Please check your internet connection and try again.";
+        } else if (error.message.includes("API_KEY_INVALID")) {
+          errorMessage =
+            "Invalid API key. Please check your Gemini API key configuration.";
+        } else if (
+          error.message.includes("quota") ||
+          error.message.includes("QUOTA")
+        ) {
+          errorMessage =
+            "API quota exceeded. Please check your Gemini API usage limits.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      return `❌ Failed to generate project: ${errorMessage}\n\nTip: Try a simpler request or check your API configuration.`;
     } finally {
       setIsAIGenerating(false);
     }
