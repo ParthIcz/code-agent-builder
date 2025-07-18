@@ -1,10 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-const fetch = (...args) => import('node-fetch').then(mod => mod.default(...args));
-const fs = require('fs');
-const path = require('path');
-const { exec } = require('child_process');
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const fetch = (...args) =>
+  import("node-fetch").then((mod) => mod.default(...args));
+const fs = require("fs");
+const path = require("path");
+const { exec } = require("child_process");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -17,40 +18,69 @@ app.use(cors());
 app.use(express.json());
 
 // Health check route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend server is running!' });
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", message: "Backend server is running!" });
 });
 
-app.post('/api/generate-project', async (req, res) => {
+app.post("/api/generate-project", async (req, res) => {
   console.log("Received project request:", req.body);
   const projectRequest = req.body;
 
-  const prompt = `You are an expert web developer. Generate a complete, production-ready website project based on the user's requirements.
+  const prompt = `You are an expert full-stack web developer with 15+ years of experience. Create a complete, production-ready, error-free website project based on the user's requirements.
 
-IMPORTANT: Return ONLY a valid JSON object with this exact structure:
+IMPORTANT: Return ONLY a valid JSON object with this EXACT structure:
 {
-  "name": "project-name",
-  "description": "brief description",
+  "name": "project-name-kebab-case",
+  "description": "brief description of the project",
   "files": {
-    "filename.ext": {
-      "content": "complete file content",
-      "type": "file extension"
+    "index.html": {
+      "content": "complete HTML content",
+      "type": "html"
+    },
+    "style.css": {
+      "content": "complete CSS content",
+      "type": "css"
+    },
+    "script.js": {
+      "content": "complete JavaScript content",
+      "type": "js"
     }
   }
 }
 
-Requirements:
-- Use plain HTML, CSS, and JavaScript files (.html, .css, .js)
-- All code must be complete and functional
-- Include a complete index.html as the main entry point
-- Include all necessary CSS and JS files
-- Make the website responsive and accessible
-- Use modern best practices for HTML, CSS, and JavaScript
-- Include proper file structure and organization
+STRICT REQUIREMENTS:
+1. ALWAYS include index.html as the main entry point
+2. ALWAYS include style.css for styling
+3. ALWAYS include script.js for functionality
+4. Use semantic HTML5 elements (header, nav, main, section, article, aside, footer)
+5. CSS must be modern with:
+   - CSS Grid and Flexbox for layout
+   - CSS Variables for consistent theming
+   - Responsive design with mobile-first approach
+   - Smooth transitions and hover effects
+   - Professional color schemes
+6. JavaScript must be modern ES6+ with:
+   - Arrow functions and const/let declarations
+   - Event delegation and proper DOM manipulation
+   - Error handling with try/catch
+   - Modular code structure
+   - Interactive features and animations
+7. Make it fully responsive (mobile, tablet, desktop)
+8. Include proper accessibility features (ARIA labels, semantic HTML)
+9. Add loading states and smooth animations
+10. Include complete, working functionality - NO placeholders or TODO comments
+11. Use professional styling with gradients, shadows, and modern design patterns
+12. Add interactive elements like buttons, forms, modals as appropriate
+13. Include proper meta tags, viewport, and SEO optimization
+14. Add favicon support and proper document structure
+15. Implement proper error handling and user feedback
 
-Generate a website project with the following requirements:
-
+Project Requirements:
 Description: ${projectRequest.description}
+Project Type: ${projectRequest.projectType || "modern web application"}
+Features: ${projectRequest.features ? projectRequest.features.join(", ") : "responsive design, modern UI, interactive elements"}
+
+Generate a COMPLETE, FUNCTIONAL project that works perfectly when opened in a browser. All code must be error-free and production-ready.
 
 Return ONLY the JSON object, no additional text or formatting.`;
 
@@ -75,10 +105,22 @@ Return ONLY the JSON object, no additional text or formatting.`;
           maxOutputTokens: 8192,
         },
         safetySettings: [
-          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE",
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE",
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE",
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE",
+          },
         ],
       }),
     });
@@ -96,7 +138,9 @@ Return ONLY the JSON object, no additional text or formatting.`;
 
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return res.status(500).json({ error: "Invalid response format from Gemini API" });
+      return res
+        .status(500)
+        .json({ error: "Invalid response format from Gemini API" });
     }
 
     let projectData;
@@ -104,13 +148,15 @@ Return ONLY the JSON object, no additional text or formatting.`;
       projectData = JSON.parse(jsonMatch[0]);
     } catch (parseError) {
       console.error("JSON parsing error:", parseError);
-      return res.status(500).json({ error: "Failed to parse JSON response from Gemini API" });
+      return res
+        .status(500)
+        .json({ error: "Failed to parse JSON response from Gemini API" });
     }
 
-    const tempDir = path.join(__dirname, 'temp_build');
+    const tempDir = path.join(__dirname, "temp_build");
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-    fs.readdirSync(tempDir).forEach(f => {
+    fs.readdirSync(tempDir).forEach((f) => {
       fs.rmSync(path.join(tempDir, f), { recursive: true, force: true });
     });
 
@@ -118,23 +164,24 @@ Return ONLY the JSON object, no additional text or formatting.`;
       const filePath = path.join(tempDir, filename);
       const dir = path.dirname(filePath);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(filePath, fileData.content, 'utf-8');
+      fs.writeFileSync(filePath, fileData.content, "utf-8");
     }
 
     if (!previewServerStarted) {
       const expressStatic = express();
       expressStatic.use(express.static(tempDir));
       expressStatic.listen(previewPort, () => {
-        console.log(`Preview server running at http://localhost:${previewPort}`);
+        console.log(
+          `Preview server running at http://localhost:${previewPort}`,
+        );
       });
       previewServerStarted = true;
     }
 
     res.json({
       ...projectData,
-      previewUrl: `http://localhost:${previewPort}/index.html`
+      previewUrl: `http://localhost:${previewPort}/index.html`,
     });
-
   } catch (err) {
     console.error("Error in /api/generate-project:", err);
     res.status(500).json({ error: err.message || "Unknown error" });
