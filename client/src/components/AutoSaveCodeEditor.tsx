@@ -35,12 +35,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
   File,
   Folder,
   FolderOpen,
@@ -60,6 +54,7 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
+  ChevronLeft,
 } from "lucide-react";
 import type { ProjectFile, FileTreeNode } from "@/types";
 import { FileService, FileOperationResult } from "@/services/fileService";
@@ -322,15 +317,17 @@ export function AutoSaveCodeEditor({
   useEffect(() => {
     if (!editorRef.current || !selectedFile || !files[selectedFile]) return;
 
+    const selectedFileContent = files[selectedFile]?.content;
+
     // Auto-save functionality
     const handleContentChange = (content: string) => {
       // Update local state immediately
       onFileUpdate(selectedFile, content);
 
       // Set saving status
-      setSaveStatus(prev => ({
+      setSaveStatus((prev) => ({
         ...prev,
-        [selectedFile]: 'saving'
+        [selectedFile]: "saving",
       }));
 
       // Auto-save to server if projectId is available
@@ -341,16 +338,16 @@ export function AutoSaveCodeEditor({
           content,
           () => {
             // On save start
-            setSaveStatus(prev => ({
+            setSaveStatus((prev) => ({
               ...prev,
-              [selectedFile]: 'saving'
+              [selectedFile]: "saving",
             }));
           },
           (result: FileOperationResult) => {
             // On save complete
-            setSaveStatus(prev => ({
+            setSaveStatus((prev) => ({
               ...prev,
-              [selectedFile]: result.success ? 'saved' : 'error'
+              [selectedFile]: result.success ? "saved" : "error",
             }));
 
             if (!result.success) {
@@ -364,35 +361,54 @@ export function AutoSaveCodeEditor({
         );
       } else {
         // No project ID, mark as unsaved
-        setSaveStatus(prev => ({
+        setSaveStatus((prev) => ({
           ...prev,
-          [selectedFile]: 'unsaved'
+          [selectedFile]: "unsaved",
         }));
       }
     };
 
-    const state = EditorState.create({
-      doc: files[selectedFile].content,
-      extensions: [
-        ...extensions,
-        EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
-            const content = update.state.doc.toString();
-            handleContentChange(content);
-          }
-        }),
-      ],
-    });
+    // Initialize editor only once
+    if (!editorViewRef.current) {
+      const state = EditorState.create({
+        doc: selectedFileContent,
+        extensions: [
+          ...extensions,
+          EditorView.updateListener.of((update) => {
+            if (update.docChanged) {
+              const content = update.state.doc.toString();
+              handleContentChange(content);
+            }
+          }),
+        ],
+      });
 
-    const view = new EditorView({
-      state,
-      parent: editorRef.current,
-    });
+      const view = new EditorView({
+        state,
+        parent: editorRef.current,
+      });
 
-    editorViewRef.current = view;
+      editorViewRef.current = view;
+    } else {
+      const currentContent = editorViewRef.current.state.doc.toString();
+      const newContent = selectedFileContent;
+
+      if (currentContent !== newContent) {
+        const transaction = editorViewRef.current.state.update({
+          changes: {
+            from: 0,
+            to: editorViewRef.current.state.doc.length,
+            insert: newContent,
+          },
+        });
+        editorViewRef.current.dispatch(transaction);
+      }
+    }
 
     return () => {
-      view.destroy();
+      // Do not destroy the editor to preserve focus
+      editorViewRef.current?.destroy();
+      editorViewRef.current = null;
     };
   }, [selectedFile, files, extensions, onFileUpdate, projectId]);
 
@@ -409,8 +425,9 @@ export function AutoSaveCodeEditor({
             to: editorViewRef.current.state.doc.length,
             insert: newContent,
           },
+          selection: editorViewRef.current.state.selection, // Preserve cursor position
         });
-        // editorViewRef.current.dispatch(transaction);
+        editorViewRef.current.dispatch(transaction);
       }
     }
   }, [files, selectedFile]);
@@ -539,17 +556,18 @@ export function AutoSaveCodeEditor({
     <Card className="flex-1 h-full flex flex-col overflow-hidden">
       <div className="flex items-center justify-between p-3 border-b flex-shrink-0">
         <div className="flex items-center space-x-2">
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <Menu className="w-4 h-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-80 p-0">
-              <SheetTitle className="sr-only">File Explorer</SheetTitle>
-              {sidebar}
-            </SheetContent>
-          </Sheet>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? (
+              <ChevronLeft className="w-4 h-4" />
+            ) : (
+              <Menu className="w-4 h-4" />
+            )}
+          </Button>
 
           <div className="flex items-center space-x-1">
             {openTabs.slice(0, 5).map((filename) => (
@@ -576,7 +594,7 @@ export function AutoSaveCodeEditor({
                     closeTab(filename);
                   }}
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-3 h-3" />4
                 </Button>
               </div>
             ))}
@@ -610,10 +628,9 @@ export function AutoSaveCodeEditor({
       </div>
 
       <div className="flex-1 flex min-h-0">
-        {!sidebarOpen && (
+        {sidebarOpen && (
           <div className="w-64 border-r flex-shrink-0">{sidebar}</div>
         )}
-        
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 relative min-h-0">
             {selectedFile && files[selectedFile] ? (

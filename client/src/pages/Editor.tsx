@@ -143,15 +143,15 @@ export default function Editor() {
     }));
 
     // Add chat message
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        id: `msg-${++messageIdRef.current}-${Date.now()}`,
-        type: "system",
-        content: `🛠 Updated \`${filename}\``,
-        timestamp: new Date(),
-      },
-    ]);
+    // setChatMessages((prev) => [
+    //   ...prev,
+    //   {
+    //     id: `msg-${++messageIdRef.current}-${Date.now()}`,
+    //     type: "system",
+    //     content: `🛠 Updated \`${filename}\``,
+    //     timestamp: new Date(),
+    //   },
+    // ]);
   };
 
   const handleChatSubmit = useCallback((message: string) => {
