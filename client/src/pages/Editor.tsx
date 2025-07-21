@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { ChatAgent } from "@/components/ChatAgent";
-import { CodeEditor } from "@/components/CodeEditor";
-import { LivePreview } from "@/components/LivePreview";
+import { AutoSaveCodeEditor } from "@/components/AutoSaveCodeEditor";
+import { RealtimePreview } from "@/components/RealtimePreview";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -31,6 +31,7 @@ import { toast } from "@/hooks/use-toast";
 import { downloadProjectAsZip } from "@/lib/files";
 import type { ProjectFile, ChatMessage } from "@/types";
 import { useNavigate } from "react-router-dom";
+import { FileService } from "@/services/fileService";
 
 export default function Editor() {
   // Always call hooks at the top level
@@ -49,6 +50,7 @@ export default function Editor() {
   );
   const [chatOpen, setChatOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
+  const [projectId, setProjectId] = useState<string | undefined>(undefined);
 
   // Panel size persistence
   const [panelSizes, setPanelSizes] = useState(() => {
@@ -69,23 +71,50 @@ export default function Editor() {
     }
   };
 
-  const handleProjectGenerated = (
+  const handleProjectGenerated = async (
     generatedFiles: Record<string, ProjectFile>,
     previewUrl?: string,
   ) => {
     setFiles(generatedFiles);
-    setPreviewUrl(previewUrl);
+
+    // Generate a unique project ID
+    const newProjectId = FileService.generateProjectId();
+    setProjectId(newProjectId);
+
+    // Create project on server
+    try {
+      const result = await FileService.createProject(newProjectId, generatedFiles);
+      if (result.success) {
+        setPreviewUrl(result.previewUrl || FileService.getPreviewUrl(newProjectId));
+        toast({
+          title: "Project Created",
+          description: `Successfully created project with ${Object.keys(generatedFiles).length} files`,
+        });
+      } else {
+        toast({
+          title: "Project Creation Failed",
+          description: result.error || "Failed to create project on server",
+          variant: "destructive",
+        });
+        // Fall back to local preview
+        setPreviewUrl(previewUrl);
+      }
+    } catch (error) {
+      console.error("Error creating project:", error);
+      toast({
+        title: "Project Creation Error",
+        description: "Failed to create project on server",
+        variant: "destructive",
+      });
+      // Fall back to local preview
+      setPreviewUrl(previewUrl);
+    }
 
     // Select first file by default
     const firstFile = Object.keys(generatedFiles)[0];
     if (firstFile) {
       setSelectedFile(firstFile);
     }
-
-    toast({
-      title: "Project Generated",
-      description: `Successfully generated ${Object.keys(generatedFiles).length} files`,
-    });
   };
 
   const loadInitialProject = () => {
@@ -339,10 +368,12 @@ export default function Editor() {
               defaultSize={panelSizes[1]}
               minSize={30}
               maxSize={60}
+              className="h-full"
             >
-              <CodeEditor
+              <AutoSaveCodeEditor
                 files={files}
                 selectedFile={selectedFile}
+                projectId={projectId}
                 onFileSelect={setSelectedFile}
                 onFileUpdate={handleFileUpdate}
               />
@@ -358,8 +389,12 @@ export default function Editor() {
               defaultSize={panelSizes[2]}
               minSize={20}
               maxSize={50}
+              className="h-full"
             >
-              <LivePreview files={files} previewUrl={previewUrl} />
+              <RealtimePreview 
+                projectId={projectId}
+                previewUrl={previewUrl} 
+              />
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
@@ -375,15 +410,19 @@ export default function Editor() {
             />
           )}
           {activePanel === "code" && (
-            <CodeEditor
+            <AutoSaveCodeEditor
               files={files}
               selectedFile={selectedFile}
+              projectId={projectId}
               onFileSelect={setSelectedFile}
               onFileUpdate={handleFileUpdate}
             />
           )}
           {activePanel === "preview" && (
-            <LivePreview files={files} previewUrl={previewUrl} />
+            <RealtimePreview 
+              projectId={projectId}
+              previewUrl={previewUrl} 
+            />
           )}
         </div>
       </div>

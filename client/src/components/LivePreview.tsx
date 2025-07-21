@@ -32,30 +32,14 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [useExternalPreview, setUseExternalPreview] = useState(false);
   const [viewportSize, setViewportSize] = useState<
     "mobile" | "tablet" | "desktop"
   >("desktop");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Check if we have a preview URL from the improved API
+  // Generate preview content with debouncing for smooth updates
   useEffect(() => {
-    if (previewUrl && previewUrl.startsWith('http://localhost:')) {
-      setUseExternalPreview(true);
-      setIsLoading(false);
-      setHasError(false);
-      console.log("✅ Using external preview server:", previewUrl);
-    } else {
-      setUseExternalPreview(false);
-      console.log("📝 Using embedded preview generation");
-    }
-  }, [previewUrl]);
-
-  // Generate preview content with debouncing for smooth updates (only for embedded preview)
-  useEffect(() => {
-    if (useExternalPreview) return; // Skip if using external preview
-    
     // Clear existing timeout
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
@@ -90,7 +74,7 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
         clearTimeout(updateTimeoutRef.current);
       }
     };
-  }, [files, useExternalPreview]);
+  }, [files]);
 
   const generatePreviewHTML = (files: Record<string, ProjectFile>): string => {
     // If no files are generated yet, show empty state
@@ -394,27 +378,9 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
     files: Record<string, ProjectFile>,
     htmlContent: string,
   ): string => {
-    // Find and inject CSS files
-    const cssFiles = Object.entries(files).filter(
-      ([path, file]) => path.endsWith(".css") || file.type === "css",
-    );
+    // Process the HTML content and inject styles
+    return injectStyles(htmlContent, files);
 
-    let styles = "";
-    cssFiles.forEach(([path, file]) => {
-      styles += file.content + "\n";
-    });
-
-    // Inject Tailwind and custom styles
-    const styledHtml = htmlContent.replace(
-      "</head>",
-      `  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    ${styles}
-  </style>
-</head>`,
-    );
-
-    return styledHtml;
   };
 
   const buildFromAvailableFiles = (
@@ -570,58 +536,6 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
   const generateSmartPreview = (files: Record<string, ProjectFile>): string => {
     const fileEntries = Object.entries(files);
     
-    // Try to detect what kind of app this might be based on content
-    const allContent = fileEntries.map(([, file]) => file.content).join(' ').toLowerCase();
-    
-    if (allContent.includes('todo') || allContent.includes('task')) {
-      return `
-        <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-          <div class="max-w-2xl mx-auto">
-            <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Todo App</h1>
-            <div class="bg-white rounded-xl shadow-lg p-6">
-              <div class="mb-4">
-                <input type="text" placeholder="Add a new todo..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-              <div class="space-y-2">
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <input type="checkbox" class="mr-3">
-                  <span>Sample todo item</span>
-                </div>
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <input type="checkbox" checked class="mr-3">
-                  <span class="line-through text-gray-500">Completed todo</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-    }
-    
-    if (allContent.includes('portfolio') || allContent.includes('about') || allContent.includes('contact')) {
-      return `
-        <div class="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900">
-          <nav class="p-6">
-            <div class="flex justify-between items-center max-w-6xl mx-auto">
-              <h1 class="text-2xl font-bold text-white">Portfolio</h1>
-              <div class="space-x-6 text-white">
-                <a href="#about" class="hover:text-purple-300">About</a>
-                <a href="#projects" class="hover:text-purple-300">Projects</a>
-                <a href="#contact" class="hover:text-purple-300">Contact</a>
-              </div>
-            </div>
-          </nav>
-          <div class="flex items-center justify-center min-h-[80vh] px-6">
-            <div class="text-center max-w-4xl">
-              <h2 class="text-6xl font-bold mb-6 text-white">Your Portfolio</h2>
-              <p class="text-xl text-purple-200 mb-8">Welcome to your AI-generated portfolio website</p>
-              <button class="bg-white text-purple-900 px-8 py-3 rounded-full font-semibold hover:bg-purple-100 transition-colors">
-                View My Work
-              </button>
-            </div>
-          </div>
-        </div>`;
-    }
-    
     // Generic preview for other types of content
     return `
       <div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8">
@@ -666,6 +580,27 @@ export function LivePreview({ files, previewUrl }: LivePreviewProps) {
           </div>
         </div>
       </div>`;
+  };
+
+  const injectStyles = (html: string, files: Record<string, ProjectFile>): string => {
+    const cssContent = Object.entries(files)
+      .filter(([path, file]) => path.endsWith(".css") || file.type === "css")
+      .map(([_, file]) => file.content)
+      .join("\n");
+
+    if (cssContent && html.includes("</head>")) {
+      return html.replace("</head>", `<style>${cssContent}</style></head>`);
+    }
+    
+    // If no </head> tag found, try to add it after <html> or at the start
+    if (cssContent) {
+      if (html.includes("<html>")) {
+        return html.replace("<html>", `<html><head><style>${cssContent}</style></head>`);
+      }
+      return `<html><head><style>${cssContent}</style></head>${html}</html>`;
+    }
+    
+    return html;
   };
 
   const generateFallbackContent = (

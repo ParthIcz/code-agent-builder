@@ -81,7 +81,7 @@ export function ChatAgent({
       // Notify parent component about the generated project
       if (onProjectGenerated) {
         // Pass previewUrl if present
-        (onProjectGenerated as any)(projectFiles, generatedProject.previewUrl);
+        (onProjectGenerated)(projectFiles, generatedProject.previewUrl);
       }
 
       return `✅ Successfully generated "${generatedProject.name}"!\n\n${generatedProject.description}\n\nGenerated ${Object.keys(projectFiles).length} files. You can now edit them in the code editor and see the live preview.${generatedProject.previewUrl ? `\n\nPreview: ${generatedProject.previewUrl}` : ""}`;
@@ -151,12 +151,12 @@ export function ChatAgent({
   };
 
   const quickPrompts = [
-    "Create a modern portfolio website with HTML, CSS, and JavaScript",
-    "Build a todo app with HTML, CSS, and JavaScript",
-    "Generate a landing page for a SaaS product with HTML, CSS, and JavaScript",
-    "Create a dashboard with charts and data visualization using HTML, CSS, and JavaScript",
-    "Build an e-commerce product catalog with HTML, CSS, and JavaScript",
-    "Generate a blog website with markdown support using HTML, CSS, and JavaScript",
+    "Create a modern luxury construction company website with premium design, sophisticated animations, rich content sections, professional portfolio gallery, team showcase, and advanced CSS styling",
+    "Build a premium architecture firm website with dark theme, gold accents, animated hero section, services portfolio, client testimonials, and professional contact forms",
+    "Generate a luxury real estate agency website with stunning visuals, property galleries, agent profiles, market insights, and sophisticated user interface",
+    "Create a high-end interior design studio website with portfolio showcase, design process timeline, luxury aesthetics, and premium branding",
+    "Build a premium consulting firm website with professional services, case studies, team expertise, and corporate elegance",
+    "Generate a luxury hospitality website with immersive galleries, booking system, amenities showcase, and sophisticated design",
   ];
 
   const getMessageIcon = (type: ChatMessage["type"]) => {
@@ -235,20 +235,50 @@ export function ChatAgent({
                     Gemini AI. Try commands like:
                   </p>
                   <div className="space-y-2 text-xs sm:text-sm">
-                    {quickPrompts.map((prompt, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setInput(prompt)}
-                        className="block w-full p-3 rounded-xl bg-gradient-to-r from-muted to-muted/50 border border-primary/20 hover:border-primary/40 hover:from-primary/10 hover:to-primary/5 transition-all text-left shadow-sm group"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-foreground font-medium">
-                            {prompt}
-                          </span>
-                          <Sparkles className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </div>
-                      </button>
-                    ))}
+                    <button
+                      onClick={() => setInput("Create a modern luxury construction company website with premium design, sophisticated animations, rich content sections, professional portfolio gallery, team showcase, and advanced CSS styling")}
+                      className="block w-full p-3 rounded-xl bg-gradient-to-r from-muted to-muted/50 border border-primary/20 hover:border-primary/40 hover:from-primary/10 hover:to-primary/5 transition-all text-left shadow-sm group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-foreground font-medium">
+                          🏗️ Luxury Construction Company Website
+                        </span>
+                        <Sparkles className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setInput("Build a premium architecture firm website with dark theme, gold accents, animated hero section, services portfolio, client testimonials, and professional contact forms")}
+                      className="block w-full p-3 rounded-xl bg-gradient-to-r from-muted to-muted/50 border border-primary/20 hover:border-primary/40 hover:from-primary/10 hover:to-primary/5 transition-all text-left shadow-sm group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-foreground font-medium">
+                          🏛️ Premium Architecture Firm
+                        </span>
+                        <Sparkles className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setInput("Generate a luxury real estate agency website with stunning visuals, property galleries, agent profiles, market insights, and sophisticated user interface")}
+                      className="block w-full p-3 rounded-xl bg-gradient-to-r from-muted to-muted/50 border border-primary/20 hover:border-primary/40 hover:from-primary/10 hover:to-primary/5 transition-all text-left shadow-sm group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-foreground font-medium">
+                          🏘️ Luxury Real Estate Agency
+                        </span>
+                        <Sparkles className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setInput("Create a high-end interior design studio website with portfolio showcase, design process timeline, luxury aesthetics, and premium branding")}
+                      className="block w-full p-3 rounded-xl bg-gradient-to-r from-muted to-muted/50 border border-primary/20 hover:border-primary/40 hover:from-primary/10 hover:to-primary/5 transition-all text-left shadow-sm group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-foreground font-medium">
+                          🎨 High-End Interior Design Studio
+                        </span>
+                        <Sparkles className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                    </button>
                   </div>
                 </div>
               </CardContent>
