@@ -313,11 +313,10 @@ export function AutoSaveCodeEditor({
     ...getLanguageExtension(selectedFile),
   ], [selectedFile]);
 
-  // Initialize editor
+  // Initialize editor (modified to run on each selectedFile change)
   useEffect(() => {
     if (!editorRef.current || !selectedFile || !files[selectedFile]) return;
-
-    const selectedFileContent = files[selectedFile]?.content;
+    const selectedFileContent = files[selectedFile].content;
 
     // Auto-save functionality
     const handleContentChange = (content: string) => {
@@ -368,66 +367,47 @@ export function AutoSaveCodeEditor({
       }
     };
 
-    // Initialize editor only once
-    if (!editorViewRef.current) {
-      const state = EditorState.create({
-        doc: selectedFileContent,
-        extensions: [
-          ...extensions,
-          EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
-              const content = update.state.doc.toString();
-              handleContentChange(content);
-            }
-          }),
-        ],
-      });
-
-      const view = new EditorView({
-        state,
-        parent: editorRef.current,
-      });
-
-      editorViewRef.current = view;
-    } else {
-      const currentContent = editorViewRef.current.state.doc.toString();
-      const newContent = selectedFileContent;
-
-      if (currentContent !== newContent) {
-        const transaction = editorViewRef.current.state.update({
-          changes: {
-            from: 0,
-            to: editorViewRef.current.state.doc.length,
-            insert: newContent,
-          },
-        });
-        editorViewRef.current.dispatch(transaction);
-      }
-    }
+    // (Re)initialize editor for each selected file.
+    const state = EditorState.create({
+      doc: selectedFileContent,
+      extensions: [
+        ...extensions,
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            const content = update.state.doc.toString();
+            handleContentChange(content);
+          }
+        }),
+      ],
+    });
+    // Destroy any previous instance before creating a new one
+    editorViewRef.current?.destroy();
+    editorViewRef.current = new EditorView({
+      state,
+      parent: editorRef.current,
+    });
 
     return () => {
-      // Do not destroy the editor to preserve focus
-      editorViewRef.current?.destroy();
-      editorViewRef.current = null;
+      // Optionally keep the instance for current selection
     };
-  }, [selectedFile, files, extensions, onFileUpdate, projectId]);
+  }, [selectedFile]); // run on each selectedFile change
 
-  // Update editor content when file changes
+  // Update editor content when file changes and preserve history for undo (Ctrl+Z)
   useEffect(() => {
     if (editorViewRef.current && selectedFile && files[selectedFile]) {
-      const currentContent = editorViewRef.current.state.doc.toString();
+      const view = editorViewRef.current;
+      const currentDoc = view.state.doc.toString();
       const newContent = files[selectedFile].content;
-
-      if (currentContent !== newContent) {
-        const transaction = editorViewRef.current.state.update({
-          changes: {
-            from: 0,
-            to: editorViewRef.current.state.doc.length,
-            insert: newContent,
-          },
-          selection: editorViewRef.current.state.selection, // Preserve cursor position
+      if (currentDoc !== newContent) {
+        const currentOffset = view.state.selection.main.head;
+        const newPos =
+          currentOffset > newContent.length ? newContent.length : currentOffset;
+        const transaction = view.state.update({
+          changes: { from: 0, to: view.state.doc.length, insert: newContent },
+          selection: { anchor: newPos },
         });
-        editorViewRef.current.dispatch(transaction);
+        view.dispatch(transaction); // exclude external update from history
+        view.focus();
       }
     }
   }, [files, selectedFile]);
